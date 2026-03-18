@@ -43,6 +43,8 @@ export const darkColors = {
   peach: "#FAB387",
   teal: "#94E2D5",
   lavender: "#B4BEFE",
+  base: "#1E1E2E",
+  crust: "#11111B",
 } as const;
 
 // Catppuccin Latte (light) – designed for white/light backgrounds
@@ -61,6 +63,8 @@ export const lightColors = {
   peach: "#FE640B",     // Peach
   teal: "#179299",      // Teal
   lavender: "#7287FD",  // Lavender
+  base: "#EFF1F5",      // Base
+  crust: "#DCE0E8",     // Crust
 } as const;
 
 export interface Colors {
@@ -78,6 +82,8 @@ export interface Colors {
   readonly peach: string;
   readonly teal: string;
   readonly lavender: string;
+  readonly base: string;
+  readonly crust: string;
 }
 
 export const colorScheme: ColorScheme = detectColorScheme();

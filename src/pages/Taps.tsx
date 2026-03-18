@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
-import { colors } from "../theme.ts";
+import { SIDEBAR_WIDTH, STATUS_BAR_HEIGHT } from "../theme.ts";
+import { useTheme } from "../hooks/useTheme.tsx";
 import { useAsync } from "../hooks/useAsync.ts";
 import { useTerminalSize } from "../hooks/useTerminalSize.ts";
 import { Table, type Column } from "../components/Table.tsx";
 import { Loading, ErrorDisplay } from "../components/Loading.tsx";
-import { SIDEBAR_WIDTH, STATUS_BAR_HEIGHT } from "../theme.ts";
 import * as brew from "../brew/index.ts";
 
 interface TapRow {
@@ -23,6 +23,7 @@ interface TapsProps {
 }
 
 export function Taps({ isFocused, onAction }: TapsProps) {
+  const { colors } = useTheme();
   const { data, loading, refreshing, error, refresh } = useAsync(
     "taps",
     async () => {

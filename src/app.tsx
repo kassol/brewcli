@@ -1,6 +1,7 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { Box, Text, useApp, useInput } from "ink";
-import { colors, MIN_TERMINAL_HEIGHT, MIN_TERMINAL_WIDTH } from "./theme.ts";
+import { MIN_TERMINAL_HEIGHT, MIN_TERMINAL_WIDTH } from "./theme.ts";
+import { ThemeProvider, useTheme } from "./hooks/useTheme.tsx";
 import { useTerminalSize } from "./hooks/useTerminalSize.ts";
 import { invalidateCache } from "./hooks/useAsync.ts";
 import { Sidebar, type SidebarSection } from "./components/Sidebar.tsx";
@@ -31,32 +32,44 @@ interface ConfirmState {
   action: () => Promise<void>;
 }
 
-const sidebarSections: SidebarSection[] = [
-  {
-    header: "Packages",
-    items: [
-      { key: "dashboard", label: "Dashboard" },
-      { key: "formulae", label: "Formulae" },
-      { key: "casks", label: "Casks" },
-    ],
-  },
-  {
-    header: "Updates",
-    items: [
-      { key: "outdated", label: "Outdated", badgeColor: colors.warning },
-    ],
-  },
-  {
-    header: "System",
-    items: [
-      { key: "services", label: "Services" },
-      { key: "taps", label: "Taps" },
-      { key: "cleanup", label: "Cleanup" },
-    ],
-  },
-];
-
 export function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}
+
+function AppContent() {
+  const { colors, colorScheme, toggleTheme } = useTheme();
+
+  const sidebarSections: SidebarSection[] = useMemo(
+    () => [
+      {
+        header: "Packages",
+        items: [
+          { key: "dashboard", label: "Dashboard" },
+          { key: "formulae", label: "Formulae" },
+          { key: "casks", label: "Casks" },
+        ],
+      },
+      {
+        header: "Updates",
+        items: [
+          { key: "outdated", label: "Outdated", badgeColor: colors.warning },
+        ],
+      },
+      {
+        header: "System",
+        items: [
+          { key: "services", label: "Services" },
+          { key: "taps", label: "Taps" },
+          { key: "cleanup", label: "Cleanup" },
+        ],
+      },
+    ],
+    [colors],
+  );
   const { exit } = useApp();
   const { width, height } = useTerminalSize();
 
@@ -331,6 +344,10 @@ export function App() {
         setFocus((f) => (f === "sidebar" ? "main" : "sidebar"));
         return;
       }
+      if (input === "t") {
+        toggleTheme();
+        return;
+      }
       if (input === "h") {
         setFocus("sidebar");
         return;
@@ -447,6 +464,7 @@ export function App() {
         mode={mode}
         notification={notification}
         loading={loading}
+        colorScheme={colorScheme}
       />
 
       {/* Overlays */}

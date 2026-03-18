@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
 import TextInput from "ink-text-input";
-import { colors } from "../theme.ts";
+import { useTheme } from "../hooks/useTheme.tsx";
 
 interface InputDialogProps {
   title: string;
@@ -18,6 +18,7 @@ export function InputDialog({
   onSubmit,
   onCancel,
 }: InputDialogProps) {
+  const { colors } = useTheme();
   const [value, setValue] = useState("");
 
   useInput((_input, key) => {

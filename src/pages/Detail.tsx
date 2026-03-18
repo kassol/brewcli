@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { Box, Text, useInput } from "ink";
-import { colors } from "../theme.ts";
+import { useTheme } from "../hooks/useTheme.tsx";
 import { useAsync } from "../hooks/useAsync.ts";
 import { useTerminalSize } from "../hooks/useTerminalSize.ts";
 import { Tree, parseDepsTree, type TreeNode } from "../components/Tree.tsx";
@@ -32,6 +32,7 @@ export type DetailAction =
   | { type: "unpin"; name: string };
 
 export function Detail({ name, type, onClose, onAction }: DetailProps) {
+  const { colors } = useTheme();
   const [tab, setTab] = useState<DetailTab>("info");
   const [treeIndex, setTreeIndex] = useState(0);
   const { height, width } = useTerminalSize();
@@ -216,6 +217,7 @@ export function Detail({ name, type, onClose, onAction }: DetailProps) {
 }
 
 function InfoRow({ label, value, color }: { label: string; value: string; color?: string }) {
+  const { colors } = useTheme();
   return (
     <Box>
       <Box width={18}>
@@ -227,6 +229,7 @@ function InfoRow({ label, value, color }: { label: string; value: string; color?
 }
 
 function FormulaDetail({ info, valueWidth }: { info: FormulaInfo; valueWidth: number }) {
+  const { colors } = useTheme();
   const installed = info.installed[0];
   const installedDate = installed
     ? new Date(installed.time * 1000).toLocaleDateString()
@@ -283,6 +286,7 @@ function FormulaDetail({ info, valueWidth }: { info: FormulaInfo; valueWidth: nu
 }
 
 function CaskDetail({ info, valueWidth }: { info: CaskInfo; valueWidth: number }) {
+  const { colors } = useTheme();
   return (
     <Box flexDirection="column" gap={0}>
       <InfoRow label="Name" value={truncate(info.name.join(", ") || info.token, valueWidth)} />

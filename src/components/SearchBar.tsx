@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Box, Text, useInput } from "ink";
 import TextInput from "ink-text-input";
-import { colors } from "../theme.ts";
+import { useTheme } from "../hooks/useTheme.tsx";
 import type { SearchResult } from "../brew/types.ts";
 import { search } from "../brew/search.ts";
 
@@ -12,6 +12,7 @@ interface SearchBarProps {
 }
 
 export function SearchBar({ onSelect, onClose, width }: SearchBarProps) {
+  const { colors } = useTheme();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);

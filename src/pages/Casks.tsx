@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { Box, Text, useInput } from "ink";
-import { colors } from "../theme.ts";
+import { SIDEBAR_WIDTH, STATUS_BAR_HEIGHT } from "../theme.ts";
+import { useTheme } from "../hooks/useTheme.tsx";
 import { useAsync } from "../hooks/useAsync.ts";
 import { useTerminalSize } from "../hooks/useTerminalSize.ts";
 import { Table, type Column, type SortDirection } from "../components/Table.tsx";
 import { Loading, ErrorDisplay } from "../components/Loading.tsx";
-import { SIDEBAR_WIDTH, STATUS_BAR_HEIGHT } from "../theme.ts";
 import * as brew from "../brew/index.ts";
 import type { CaskInfo } from "../brew/types.ts";
 
@@ -23,6 +23,7 @@ interface CasksProps {
 }
 
 export function Casks({ isFocused, onViewDetail, onAction }: CasksProps) {
+  const { colors } = useTheme();
   const { data, loading, refreshing, error, refresh } = useAsync(
     "casks:installed",
     () => brew.cask.listInstalled(),

@@ -1,16 +1,18 @@
 import React from "react";
 import { Box, Text } from "ink";
-import { colors } from "../theme.ts";
+import type { ColorScheme } from "../theme.ts";
+import { useTheme } from "../hooks/useTheme.tsx";
 
 interface StatusBarProps {
   page: string;
   mode: string;
   notification?: string | null;
   loading?: boolean;
+  colorScheme?: ColorScheme;
 }
 
 const keyHints: Record<string, string> = {
-  normal: "[/] Search  [?] Help  [Tab] Focus  [q] Quit",
+  normal:   "[/] Search  [?] Help  [Tab] Focus  [t] Theme  [q] Quit",
   search: "[Enter] Select  [Esc] Close  [Up/Down] Navigate",
   detail: "[Esc] Back  [Tab] Tabs  [i] Install  [d] Uninstall  [u] Upgrade",
   confirm: "[y] Confirm  [n] Cancel",
@@ -28,7 +30,8 @@ const pageLabels: Record<string, string> = {
   cleanup: "Cleanup",
 };
 
-export function StatusBar({ page, mode, notification, loading }: StatusBarProps) {
+export function StatusBar({ page, mode, notification, loading, colorScheme }: StatusBarProps) {
+  const { colors } = useTheme();
   const pageLabel = pageLabels[page] ?? page;
   return (
     <Box
@@ -61,6 +64,7 @@ export function StatusBar({ page, mode, notification, loading }: StatusBarProps)
         )}
         {loading && <Text color={colors.warning}>Working...</Text>}
         <Text color={colors.muted}>{pageLabel}</Text>
+        <Text color={colors.muted}>{colorScheme === "light" ? "light" : "dark"}</Text>
       </Box>
     </Box>
   );

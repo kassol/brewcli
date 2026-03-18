@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
-import { colors } from "../theme.ts";
+import { SIDEBAR_WIDTH, STATUS_BAR_HEIGHT } from "../theme.ts";
+import { useTheme } from "../hooks/useTheme.tsx";
 import { useAsync } from "../hooks/useAsync.ts";
 import { useTerminalSize } from "../hooks/useTerminalSize.ts";
 import { Table, type Column } from "../components/Table.tsx";
 import { Loading, ErrorDisplay } from "../components/Loading.tsx";
-import { SIDEBAR_WIDTH, STATUS_BAR_HEIGHT } from "../theme.ts";
 import * as brew from "../brew/index.ts";
 
 type OutdatedRow = {
@@ -27,6 +27,7 @@ interface OutdatedProps {
 }
 
 export function Outdated({ isFocused, onViewDetail, onAction }: OutdatedProps) {
+  const { colors } = useTheme();
   const { data, loading, refreshing, error, refresh } = useAsync("outdated", async () => {
     await brew.formula.update().catch(() => {});
     const outdated = await brew.formula.outdated();

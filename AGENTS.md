@@ -134,6 +134,7 @@ make test            # 运行测试
 
 ## 变更日志
 
+- 2026-03-18: 增加运行时主题切换 (T 快捷键)，Catppuccin Mocha/Latte 双主题，ThemeProvider + useTheme 架构
 - 2026-03-18: 增加设计上下文并做最终 UI/UX polish，修正表格溢出、状态提示与终端边界情况
 - 2026-03-18: 增加截图/GIF、Release 工作流、Homebrew tap 发布链路
 - 2026-03-18: 增加 README / CONTRIBUTING / LICENSE / GitHub Actions CI，补齐仓库元信息

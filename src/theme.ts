@@ -10,7 +10,7 @@ export type ColorScheme = "dark" | "light";
  * 2. COLORFGBG env – "<fg>;<bg>", bg 7 or 9-15 = light background
  * 3. Default to dark (most modern terminals)
  */
-function detectColorScheme(): ColorScheme {
+export function detectColorScheme(): ColorScheme {
   const explicit = process.env["BREWCLI_THEME"];
   if (explicit === "light") return "light";
   if (explicit === "dark") return "dark";
@@ -28,7 +28,7 @@ function detectColorScheme(): ColorScheme {
 }
 
 // Catppuccin Mocha (dark)
-const darkColors = {
+export const darkColors = {
   primary: "#89B4FA",
   success: "#A6E3A1",
   warning: "#F9E2AF",
@@ -46,7 +46,7 @@ const darkColors = {
 } as const;
 
 // Catppuccin Latte (light) – designed for white/light backgrounds
-const lightColors = {
+export const lightColors = {
   primary: "#1E66F5",   // Blue
   success: "#40A02B",   // Green
   warning: "#DF8E1D",   // Yellow

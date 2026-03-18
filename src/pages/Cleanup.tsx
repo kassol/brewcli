@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { Box, Text, useInput } from "ink";
-import { colors } from "../theme.ts";
+import { useTheme } from "../hooks/useTheme.tsx";
 import { useAsync } from "../hooks/useAsync.ts";
 import { Loading } from "../components/Loading.tsx";
 import * as brew from "../brew/index.ts";
@@ -19,6 +19,7 @@ interface CleanupProps {
 }
 
 export function Cleanup({ isFocused, onNotify }: CleanupProps) {
+  const { colors } = useTheme();
   const { data: cacheSize, loading: cacheSizeLoading } = useAsync(
     "cleanup:cacheSize",
     () => brew.cleanup.cacheSize(),

@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Text, useInput } from "ink";
-import { colors } from "../theme.ts";
+import { useTheme } from "../hooks/useTheme.tsx";
 import { useAsync } from "../hooks/useAsync.ts";
 import { Loading, ErrorDisplay } from "../components/Loading.tsx";
 import * as brew from "../brew/index.ts";
@@ -46,6 +46,7 @@ function StatCard({
   value: string | number;
   color: string;
 }) {
+  const { colors } = useTheme();
   return (
     <Box
       borderStyle="round"
@@ -69,6 +70,7 @@ interface DashboardProps {
 }
 
 export function Dashboard({ isFocused }: DashboardProps) {
+  const { colors } = useTheme();
   const { data: stats, loading, refreshing, error, refresh } = useAsync(
     "dashboard",
     loadStats,

@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Text, useInput } from "ink";
-import { colors } from "../theme.ts";
+import { useTheme } from "../hooks/useTheme.tsx";
 
 interface ConfirmDialogProps {
   title: string;
@@ -17,6 +17,7 @@ export function ConfirmDialog({
   onCancel,
   destructive = false,
 }: ConfirmDialogProps) {
+  const { colors } = useTheme();
   useInput((input, key) => {
     if (input === "y" || input === "Y" || key.return) {
       onConfirm();

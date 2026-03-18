@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { Box, Text, useInput } from "ink";
-import { colors } from "../theme.ts";
+import { SIDEBAR_WIDTH, STATUS_BAR_HEIGHT } from "../theme.ts";
+import { useTheme } from "../hooks/useTheme.tsx";
 import { useAsync } from "../hooks/useAsync.ts";
 import { useTerminalSize } from "../hooks/useTerminalSize.ts";
 import { Table, type Column, type SortDirection } from "../components/Table.tsx";
 import { Loading, ErrorDisplay } from "../components/Loading.tsx";
-import { SIDEBAR_WIDTH, STATUS_BAR_HEIGHT } from "../theme.ts";
 import * as brew from "../brew/index.ts";
 import type { FormulaInfo } from "../brew/types.ts";
 
@@ -40,6 +40,7 @@ function truncate(s: string, max: number): string {
 }
 
 export function Formulae({ isFocused, onViewDetail, onAction }: FormulaeProps) {
+  const { colors } = useTheme();
   const { data, loading, refreshing, error, refresh } = useAsync(
     "formulae:installed",
     () => brew.formula.listInstalled(),
@@ -133,7 +134,7 @@ export function Formulae({ isFocused, onViewDetail, onAction }: FormulaeProps) {
         refresh();
         return;
       }
-      if (input === "t") {
+      if (input === "v") {
         setViewMode((m) => {
           const modes: ViewMode[] = ["all", "intentional", "dependency"];
           return modes[(modes.indexOf(m) + 1) % modes.length]!;
@@ -251,7 +252,7 @@ export function Formulae({ isFocused, onViewDetail, onAction }: FormulaeProps) {
             <Text color={colors.muted}>filter: {filter}</Text>
           ) : null}
           <Text color={colors.muted}>
-            [t] View  [f] Filter  [r] Refresh  [1-4] Sort
+            [v] View  [f] Filter  [r] Refresh  [1-4] Sort
           </Text>
         </Box>
       </Box>

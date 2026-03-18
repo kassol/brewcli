@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Text, useInput } from "ink";
-import { colors, SIDEBAR_WIDTH } from "../theme.ts";
+import { SIDEBAR_WIDTH } from "../theme.ts";
+import { useTheme } from "../hooks/useTheme.tsx";
 
 export interface SidebarSection {
   header: string;
@@ -35,6 +36,7 @@ export function Sidebar({
   onChangeIndex,
   isFocused,
 }: SidebarProps) {
+  const { colors } = useTheme();
   const allItems = getAllItems(sections);
 
   useInput(

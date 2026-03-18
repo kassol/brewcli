@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Box, Text, useInput } from "ink";
-import { colors } from "../theme.ts";
+import { useTheme } from "../hooks/useTheme.tsx";
 
 export interface Column<T> {
   key: string;
@@ -60,6 +60,7 @@ export function Table<T>({
   emptyMessage = "No data",
   width,
 }: TableProps<T>) {
+  const { colors } = useTheme();
   // Visible rows (header takes 2 lines: header + separator)
   const visibleRows = Math.max(1, height - 2);
 

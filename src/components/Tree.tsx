@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Box, Text, useInput } from "ink";
-import { colors } from "../theme.ts";
+import { useTheme } from "../hooks/useTheme.tsx";
 
 export interface TreeNode {
   label: string;
@@ -82,6 +82,7 @@ export function Tree({
   onChangeIndex,
   defaultExpanded = true,
 }: TreeProps) {
+  const { colors } = useTheme();
   const [expanded, setExpanded] = useState<Set<string>>(() => {
     if (!defaultExpanded) return new Set<string>();
     // Expand all by default

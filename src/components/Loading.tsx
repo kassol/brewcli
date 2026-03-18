@@ -1,13 +1,14 @@
 import React from "react";
 import { Box, Text } from "ink";
 import Spinner from "ink-spinner";
-import { colors } from "../theme.ts";
+import { useTheme } from "../hooks/useTheme.tsx";
 
 interface LoadingProps {
   message?: string;
 }
 
 export function Loading({ message = "Loading..." }: LoadingProps) {
+  const { colors } = useTheme();
   return (
     <Box justifyContent="center" alignItems="center" flexGrow={1}>
       <Box
@@ -31,6 +32,7 @@ interface ErrorDisplayProps {
 }
 
 export function ErrorDisplay({ message, onRetry }: ErrorDisplayProps) {
+  const { colors } = useTheme();
   return (
     <Box
       flexDirection="column"

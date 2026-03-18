@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Text, useInput } from "ink";
-import { colors } from "../theme.ts";
+import { useTheme } from "../hooks/useTheme.tsx";
 
 interface HelpOverlayProps {
   onClose: () => void;
@@ -16,6 +16,7 @@ const sections: { title: string; entries: HelpEntry[] }[] = [
     title: "Global",
     entries: [
       { key: "q", desc: "Quit" },
+      { key: "t", desc: "Toggle light/dark theme" },
       { key: "/", desc: "Global search" },
       { key: "?", desc: "Toggle this help" },
       { key: "Tab", desc: "Switch sidebar / main focus" },
@@ -40,7 +41,7 @@ const sections: { title: string; entries: HelpEntry[] }[] = [
       { key: "U", desc: "Upgrade all outdated" },
       { key: "p", desc: "Pin / Unpin formula" },
       { key: "r", desc: "Refresh data" },
-      { key: "t", desc: "Toggle view: all / intentional / deps" },
+      { key: "v", desc: "Toggle view: all / intentional / deps" },
     ],
   },
   {
@@ -67,6 +68,7 @@ const sections: { title: string; entries: HelpEntry[] }[] = [
 ];
 
 export function HelpOverlay({ onClose }: HelpOverlayProps) {
+  const { colors } = useTheme();
   useInput((input, key) => {
     if (key.escape || input === "?") {
       onClose();

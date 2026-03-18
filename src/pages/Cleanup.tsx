@@ -15,7 +15,7 @@ interface CleanupState {
 
 interface CleanupProps {
   isFocused: boolean;
-  onNotify: (message: string) => void;
+  onNotify: (message: string, type?: "success" | "error" | "info") => void;
 }
 
 export function Cleanup({ isFocused, onNotify }: CleanupProps) {
@@ -49,13 +49,13 @@ export function Cleanup({ isFocused, onNotify }: CleanupProps) {
               : {}),
         }));
         if (action === "cleanup") {
-          onNotify("Cleanup complete");
+          onNotify("Cleanup complete", "success");
         } else if (action === "autoremove") {
-          onNotify("Autoremove complete");
+          onNotify("Autoremove complete", "success");
         }
       } catch (e) {
         setState((s) => ({ ...s, running: false }));
-        onNotify(`Error: ${e instanceof Error ? e.message : String(e)}`);
+        onNotify(`Error: ${e instanceof Error ? e.message : String(e)}`, "error");
       }
     },
     [onNotify],

@@ -4,6 +4,7 @@ import TextInput from "ink-text-input";
 import { useTheme } from "../hooks/useTheme.tsx";
 import type { SearchResult } from "../brew/types.ts";
 import { search } from "../brew/search.ts";
+import { ModalBox } from "./ModalBox.tsx";
 
 interface SearchBarProps {
   onSelect: (result: SearchResult) => void;
@@ -73,27 +74,20 @@ export function SearchBar({ onSelect, onClose, width }: SearchBarProps) {
   const boxWidth = Math.min(width - 4, 70);
 
   return (
-    <Box
-      flexDirection="column"
-      borderStyle="round"
-      borderColor={colors.primary}
-      width={boxWidth}
-      paddingX={2}
-      paddingY={1}
-    >
+    <ModalBox width={boxWidth} borderColor={colors.primary}>
       <Box flexDirection="column">
-        <Text color={colors.primary} bold>
+        <Text color={colors.primary} bold backgroundColor={colors.base}>
           Search Packages
         </Text>
-        <Text color={colors.muted}>Formulae and casks, 2+ characters</Text>
+        <Text color={colors.muted} backgroundColor={colors.base}>Formulae and casks, 2+ characters</Text>
       </Box>
 
       <Box marginTop={1}>
-        <Text color={colors.accent} bold>
+        <Text color={colors.accent} bold backgroundColor={colors.base}>
           Query:{" "}
         </Text>
         <TextInput value={query} onChange={handleChange} />
-        {loading && <Text color={colors.muted}> searching...</Text>}
+        {loading && <Text color={colors.muted} backgroundColor={colors.base}> searching...</Text>}
       </Box>
 
       {results.length > 0 && (
@@ -109,6 +103,7 @@ export function SearchBar({ onSelect, onClose, width }: SearchBarProps) {
                       ? colors.success
                       : colors.text
                 }
+                backgroundColor={i === selectedIndex ? undefined : colors.base}
               >
                 {i === selectedIndex ? "> " : "  "}
                 [{r.type === "formula" ? "F" : "C"}] {r.name}
@@ -116,6 +111,7 @@ export function SearchBar({ onSelect, onClose, width }: SearchBarProps) {
               <Text
                 inverse={i === selectedIndex}
                 color={i === selectedIndex ? undefined : r.installed ? colors.success : colors.muted}
+                backgroundColor={i === selectedIndex ? undefined : colors.base}
               >
                 {r.installed ? "installed" : r.type}
               </Text>
@@ -126,21 +122,21 @@ export function SearchBar({ onSelect, onClose, width }: SearchBarProps) {
 
       {query.length > 0 && query.length < 2 && (
         <Box marginTop={1}>
-          <Text color={colors.muted}>Keep typing to search...</Text>
+          <Text color={colors.muted} backgroundColor={colors.base}>Keep typing to search...</Text>
         </Box>
       )}
 
       {query.length >= 2 && !loading && results.length === 0 && (
         <Box marginTop={1}>
-          <Text color={colors.muted}>No packages matched your query</Text>
+          <Text color={colors.muted} backgroundColor={colors.base}>No packages matched your query</Text>
         </Box>
       )}
 
       <Box marginTop={1}>
-        <Text color={colors.muted}>
+        <Text color={colors.muted} backgroundColor={colors.base}>
           [Enter] Open  [Esc] Close  [Up/Down] Move
         </Text>
       </Box>
-    </Box>
+    </ModalBox>
   );
 }

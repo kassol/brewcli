@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
 import TextInput from "ink-text-input";
 import { useTheme } from "../hooks/useTheme.tsx";
+import { ModalBox } from "./ModalBox.tsx";
 
 interface InputDialogProps {
   title: string;
@@ -33,21 +34,14 @@ export function InputDialog({
   });
 
   return (
-    <Box
-      flexDirection="column"
-      borderStyle="round"
-      borderColor={colors.primary}
-      paddingX={2}
-      paddingY={1}
-      width={58}
-    >
-      <Text bold color={colors.primary}>
+    <ModalBox width={58} borderColor={colors.primary}>
+      <Text bold color={colors.primary} backgroundColor={colors.base}>
         {title}
       </Text>
-      <Text color={colors.muted}>{hint}</Text>
+      <Text color={colors.muted} backgroundColor={colors.base}>{hint}</Text>
 
       <Box marginTop={1}>
-        <Text color={colors.accent} bold>
+        <Text color={colors.accent} bold backgroundColor={colors.base}>
           {">"}{" "}
         </Text>
         <TextInput
@@ -58,10 +52,10 @@ export function InputDialog({
       </Box>
 
       <Box marginTop={1}>
-        <Text color={colors.muted}>
+        <Text color={colors.muted} backgroundColor={colors.base}>
           [Enter] Submit  [Esc] Cancel
         </Text>
       </Box>
-    </Box>
+    </ModalBox>
   );
 }

@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Text, useInput } from "ink";
 import { useTheme } from "../hooks/useTheme.tsx";
+import { ModalBox } from "./ModalBox.tsx";
 
 interface HelpOverlayProps {
   onClose: () => void;
@@ -76,39 +77,32 @@ export function HelpOverlay({ onClose }: HelpOverlayProps) {
   });
 
   return (
-    <Box
-      flexDirection="column"
-      borderStyle="round"
-      borderColor={colors.primary}
-      paddingX={2}
-      paddingY={1}
-      width={56}
-    >
+    <ModalBox width={56} borderColor={colors.primary}>
       <Box justifyContent="center" marginBottom={1}>
-        <Text bold color={colors.primary}>
+        <Text bold color={colors.primary} backgroundColor={colors.base}>
           Keyboard Shortcuts
         </Text>
       </Box>
 
       {sections.map((section) => (
         <Box key={section.title} flexDirection="column" marginBottom={1}>
-          <Text bold color={colors.accent}>
+          <Text bold color={colors.accent} backgroundColor={colors.base}>
             {section.title}
           </Text>
           {section.entries.map((entry) => (
             <Box key={entry.key}>
               <Box width={14}>
-                <Text color={colors.warning}>{entry.key}</Text>
+                <Text color={colors.warning} backgroundColor={colors.base}>{entry.key}</Text>
               </Box>
-              <Text color={colors.subtext}>{entry.desc}</Text>
+              <Text color={colors.subtext} backgroundColor={colors.base}>{entry.desc}</Text>
             </Box>
           ))}
         </Box>
       ))}
 
       <Box justifyContent="center">
-        <Text color={colors.muted}>[Esc] or [?] Close</Text>
+        <Text color={colors.muted} backgroundColor={colors.base}>[Esc] or [?] Close</Text>
       </Box>
-    </Box>
+    </ModalBox>
   );
 }

@@ -25,7 +25,7 @@ TEMPLATE = """class Brewcli < Formula
   end
 
   test do
-    output = shell_output("#{bin}/brewcli --version")
+    output = shell_output("#{{bin}}/brewcli --version")
     assert_match \"brewcli {version}\", output
   end
 end

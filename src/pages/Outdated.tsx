@@ -28,6 +28,7 @@ interface OutdatedProps {
 
 export function Outdated({ isFocused, onViewDetail, onAction }: OutdatedProps) {
   const { data, loading, refreshing, error, refresh } = useAsync("outdated", async () => {
+    await brew.formula.update().catch(() => {});
     const outdated = await brew.formula.outdated();
     const rows: OutdatedRow[] = [];
 
@@ -50,7 +51,7 @@ export function Outdated({ isFocused, onViewDetail, onAction }: OutdatedProps) {
       });
     }
     return rows;
-  });
+  }, { ttl: 300_000, autoRefresh: false });
 
   const { height, width } = useTerminalSize();
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -80,7 +81,7 @@ export function Outdated({ isFocused, onViewDetail, onAction }: OutdatedProps) {
     { isActive: isFocused },
   );
 
-  if (loading && !data) return <Loading message="Checking for updates..." />;
+  if (loading && !data) return <Loading message="Updating index and checking for updates..." />;
   if (error) return <ErrorDisplay message={error} onRetry={refresh} />;
 
   const columns: Column<OutdatedRow>[] = [

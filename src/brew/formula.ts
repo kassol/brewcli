@@ -64,6 +64,10 @@ export async function unpin(name: string): Promise<void> {
   clearCache();
 }
 
+export async function update(): Promise<string> {
+  return brewExec(["update"], { timeout: 120_000 });
+}
+
 export async function outdated(): Promise<OutdatedInfo> {
   return brewExecJson<OutdatedInfo>(["outdated", "--json=v2"]);
 }

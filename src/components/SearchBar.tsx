@@ -74,7 +74,7 @@ export function SearchBar({ onSelect, onClose, width }: SearchBarProps) {
   const boxWidth = Math.min(width - 4, 70);
 
   return (
-    <ModalBox width={boxWidth} borderColor={colors.primary}>
+    <ModalBox width={boxWidth} height={25} borderColor={colors.primary}>
       <Box flexDirection="column">
         <Text color={colors.primary} bold backgroundColor={colors.base}>
           Search Packages

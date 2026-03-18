@@ -77,7 +77,7 @@ export function HelpOverlay({ onClose }: HelpOverlayProps) {
   });
 
   return (
-    <ModalBox width={56} borderColor={colors.primary}>
+    <ModalBox width={56} height={40} borderColor={colors.primary}>
       <Box justifyContent="center" marginBottom={1}>
         <Text bold color={colors.primary} backgroundColor={colors.base}>
           Keyboard Shortcuts

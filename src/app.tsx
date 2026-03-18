@@ -8,6 +8,7 @@ import { StatusBar } from "./components/StatusBar.tsx";
 import { SearchBar } from "./components/SearchBar.tsx";
 import { ConfirmDialog } from "./components/ConfirmDialog.tsx";
 import { HelpOverlay } from "./components/HelpOverlay.tsx";
+import { InputDialog } from "./components/InputDialog.tsx";
 import { Dashboard } from "./pages/Dashboard.tsx";
 import { Formulae, type FormulaeAction } from "./pages/Formulae.tsx";
 import { Casks, type CaskAction } from "./pages/Casks.tsx";
@@ -20,7 +21,7 @@ import * as brew from "./brew/index.ts";
 import type { SearchResult } from "./brew/types.ts";
 
 type Page = "dashboard" | "formulae" | "casks" | "outdated" | "services" | "taps" | "cleanup";
-type Mode = "normal" | "search" | "detail" | "confirm" | "help";
+type Mode = "normal" | "search" | "detail" | "confirm" | "help" | "input";
 type Focus = "sidebar" | "main";
 
 interface ConfirmState {
@@ -70,6 +71,14 @@ export function App() {
   // Detail state
   const [detailName, setDetailName] = useState("");
   const [detailType, setDetailType] = useState<"formula" | "cask">("formula");
+
+  // Input dialog state
+  const [inputConfig, setInputConfig] = useState<{
+    title: string;
+    hint: string;
+    placeholder?: string;
+    onSubmit: (value: string) => void;
+  } | null>(null);
 
   // Auto-clear notification
   useEffect(() => {
@@ -219,6 +228,23 @@ export function App() {
       if (action.type === "remove_tap") {
         showConfirm("Remove Tap", `Remove ${action.name}? Formulae from this tap will become unavailable.`,
           () => brew.tap.untap(action.name).then(() => {}), true);
+      }
+      if (action.type === "add_tap") {
+        setInputConfig({
+          title: "Add Tap",
+          hint: "Enter tap name, e.g. kassol/tap",
+          placeholder: "user/repo",
+          onSubmit: (value: string) => {
+            setMode("normal");
+            setInputConfig(null);
+            showConfirm(
+              "Add Tap",
+              `Tap ${value}? This will clone the repository.`,
+              () => brew.tap.tap(value).then(() => {}),
+            );
+          },
+        });
+        setMode("input");
       }
     },
     [showConfirm],
@@ -470,6 +496,25 @@ export function App() {
           height={height}
         >
           <HelpOverlay onClose={() => setMode("normal")} />
+        </Box>
+      )}
+
+      {mode === "input" && inputConfig && (
+        <Box
+          position="absolute"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+          width={width}
+          height={height}
+        >
+          <InputDialog
+            title={inputConfig.title}
+            hint={inputConfig.hint}
+            placeholder={inputConfig.placeholder}
+            onSubmit={inputConfig.onSubmit}
+            onCancel={() => { setMode("normal"); setInputConfig(null); }}
+          />
         </Box>
       )}
     </Box>

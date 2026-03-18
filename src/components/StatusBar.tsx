@@ -15,6 +15,7 @@ const keyHints: Record<string, string> = {
   detail: "[Esc] Back  [Tab] Tabs  [i] Install  [d] Uninstall  [u] Upgrade",
   confirm: "[y] Confirm  [n] Cancel",
   help: "[Esc] or [?] Close help",
+  input: "[Enter] Submit  [Esc] Cancel",
 };
 
 const pageLabels: Record<string, string> = {

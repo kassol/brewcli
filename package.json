@@ -1,6 +1,6 @@
 {
   "name": "brewcli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Interactive Homebrew TUI built with Bun, TypeScript, and Ink",
   "license": "MIT",
   "module": "src/index.tsx",

@@ -126,7 +126,7 @@ export function Formulae({ isFocused, onViewDetail, onAction }: FormulaeProps) {
         return;
       }
 
-      if (input === "/" || input === "f") {
+      if (input === "/") {
         setFilterMode(true);
         return;
       }

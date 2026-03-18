@@ -97,7 +97,7 @@ export function Casks({ isFocused, onViewDetail, onAction }: CasksProps) {
         return;
       }
 
-      if (input === "/" || input === "f") {
+      if (input === "/") {
         setFilterMode(true);
         return;
       }

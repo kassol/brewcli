@@ -21,6 +21,7 @@ interface SidebarProps {
   selectedIndex: number;
   onSelect: (key: string) => void;
   onChangeIndex: (index: number) => void;
+  onFocusMain: () => void;
   isFocused: boolean;
 }
 
@@ -34,6 +35,7 @@ export function Sidebar({
   selectedIndex,
   onSelect,
   onChangeIndex,
+  onFocusMain,
   isFocused,
 }: SidebarProps) {
   const { colors } = useTheme();
@@ -42,14 +44,19 @@ export function Sidebar({
   useInput(
     (input, key) => {
       if (input === "j" || key.downArrow) {
-        onChangeIndex(Math.min(selectedIndex + 1, allItems.length - 1));
+        const nextIndex = Math.min(selectedIndex + 1, allItems.length - 1);
+        onChangeIndex(nextIndex);
+        const item = allItems[nextIndex];
+        if (item) onSelect(item.key);
       }
       if (input === "k" || key.upArrow) {
-        onChangeIndex(Math.max(selectedIndex - 1, 0));
+        const nextIndex = Math.max(selectedIndex - 1, 0);
+        onChangeIndex(nextIndex);
+        const item = allItems[nextIndex];
+        if (item) onSelect(item.key);
       }
       if (key.return) {
-        const item = allItems[selectedIndex];
-        if (item) onSelect(item.key);
+        onFocusMain();
       }
     },
     { isActive: isFocused },

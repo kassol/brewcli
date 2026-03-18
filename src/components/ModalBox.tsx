@@ -1,11 +1,9 @@
-import React from "react";
-import { Box, Text } from "ink";
+import React, { useRef, useState, useEffect } from "react";
+import { Box, Text, measureElement, type DOMElement } from "ink";
 import { useTheme } from "../hooks/useTheme.tsx";
 
 interface ModalBoxProps {
   width: number;
-  /** Number of background fill lines. Defaults to 15. Increase for taller dialogs. */
-  height?: number;
   children: React.ReactNode;
   borderColor?: string;
 }
@@ -17,28 +15,40 @@ interface ModalBoxProps {
  * Padding, margin, and gap areas inside a Box are always transparent,
  * so underlying page content bleeds through.
  *
- * Fix: render a layer of full-width space characters with backgroundColor
- * to physically fill every cell, then overlay the bordered content on top
- * using position="absolute". The background layer sets the visual height;
- * the bordered content floats above it.
+ * Fix: render the bordered content first, measure its actual height via
+ * measureElement, then render a matching background fill layer underneath.
+ * This ensures background and border always fit perfectly regardless of
+ * content size.
  */
-export function ModalBox({ width, height, children, borderColor }: ModalBoxProps) {
+export function ModalBox({ width, children, borderColor }: ModalBoxProps) {
   const { colors } = useTheme();
   const color = borderColor ?? colors.primary;
-  const bgHeight = height ?? 15;
+  const contentRef = useRef<DOMElement>(null);
+  const [bgHeight, setBgHeight] = useState(0);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      const measured = measureElement(contentRef.current);
+      if (measured.height !== bgHeight) {
+        setBgHeight(measured.height);
+      }
+    }
+  });
 
   return (
     <Box flexDirection="column">
       <Box flexDirection="row">
         <Box flexDirection="column" width={width}>
-          {/* Background fill layer — sets visual size, covers underlying content */}
-          {Array.from({ length: bgHeight }, (_, i) => (
-            <Text key={i} backgroundColor={colors.base}>
-              {" ".repeat(width)}
-            </Text>
-          ))}
+          {/* Background fill layer — sized to match measured content */}
+          {bgHeight > 0 &&
+            Array.from({ length: bgHeight }, (_, i) => (
+              <Text key={i} backgroundColor={colors.base}>
+                {" ".repeat(width)}
+              </Text>
+            ))}
           {/* Bordered content overlays the background */}
           <Box
+            ref={contentRef}
             position="absolute"
             flexDirection="column"
             borderStyle="round"
@@ -51,18 +61,24 @@ export function ModalBox({ width, height, children, borderColor }: ModalBoxProps
           </Box>
         </Box>
         {/* Right shadow edge */}
-        <Box flexDirection="column">
-          <Text> </Text>
-          {Array.from({ length: bgHeight - 1 }, (_, i) => (
-            <Text key={i} backgroundColor={colors.crust}> </Text>
-          ))}
-        </Box>
+        {bgHeight > 0 && (
+          <Box flexDirection="column">
+            <Text> </Text>
+            {Array.from({ length: bgHeight - 1 }, (_, i) => (
+              <Text key={i} backgroundColor={colors.crust}>
+                {" ".repeat(1)}
+              </Text>
+            ))}
+          </Box>
+        )}
       </Box>
       {/* Bottom shadow edge */}
-      <Box>
-        <Text> </Text>
-        <Text backgroundColor={colors.crust}>{" ".repeat(width)}</Text>
-      </Box>
+      {bgHeight > 0 && (
+        <Box>
+          <Text> </Text>
+          <Text backgroundColor={colors.crust}>{" ".repeat(width)}</Text>
+        </Box>
+      )}
     </Box>
   );
 }

@@ -17,11 +17,18 @@ const sections: { title: string; entries: HelpEntry[] }[] = [
     title: "Global",
     entries: [
       { key: "q", desc: "Quit" },
-      { key: "t", desc: "Toggle light/dark theme" },
-      { key: "/", desc: "Global search" },
       { key: "?", desc: "Toggle this help" },
+      { key: "S", desc: "Search packages (brew search)" },
+      { key: "t", desc: "Toggle light/dark theme" },
       { key: "Tab", desc: "Switch sidebar / main focus" },
       { key: "h / l", desc: "Focus sidebar / main" },
+    ],
+  },
+  {
+    title: "Sidebar",
+    entries: [
+      { key: "j / k", desc: "Navigate and switch page" },
+      { key: "Enter / l", desc: "Focus main panel" },
     ],
   },
   {
@@ -29,9 +36,11 @@ const sections: { title: string; entries: HelpEntry[] }[] = [
     entries: [
       { key: "j / k", desc: "Move down / up" },
       { key: "g / G", desc: "Jump to first / last" },
-      { key: "Enter", desc: "View details / select" },
-      { key: "f", desc: "Filter list" },
+      { key: "Enter", desc: "View details" },
+      { key: "/", desc: "Filter list" },
       { key: "Esc", desc: "Clear filter / close overlay" },
+      { key: "r", desc: "Refresh data" },
+      { key: "1-4", desc: "Sort by column" },
     ],
   },
   {
@@ -41,29 +50,35 @@ const sections: { title: string; entries: HelpEntry[] }[] = [
       { key: "u", desc: "Upgrade package" },
       { key: "U", desc: "Upgrade all outdated" },
       { key: "p", desc: "Pin / Unpin formula" },
-      { key: "r", desc: "Refresh data" },
-      { key: "v", desc: "Toggle view: all / intentional / deps" },
-    ],
-  },
-  {
-    title: "Sort",
-    entries: [
-      { key: "1-4", desc: "Sort by column (Formulae/Casks)" },
+      { key: "v", desc: "Cycle view: all / intentional / deps" },
     ],
   },
   {
     title: "Detail View",
     entries: [
-      { key: "Tab", desc: "Switch between Info / Deps / Uses tabs" },
+      { key: "Tab", desc: "Switch Info / Deps / Uses tabs" },
       { key: "i", desc: "Install" },
-      { key: "Esc", desc: "Close detail" },
+      { key: "d", desc: "Uninstall" },
+      { key: "u", desc: "Upgrade" },
+      { key: "p", desc: "Pin / Unpin" },
+      { key: "Esc", desc: "Close" },
     ],
   },
   {
-    title: "Services",
+    title: "Services & Taps",
     entries: [
       { key: "s", desc: "Start / Stop service" },
       { key: "R", desc: "Restart service" },
+      { key: "a", desc: "Add tap" },
+    ],
+  },
+  {
+    title: "Cleanup",
+    entries: [
+      { key: "p", desc: "Preview cleanup" },
+      { key: "c", desc: "Run cleanup" },
+      { key: "a / A", desc: "Preview / Run autoremove" },
+      { key: "D", desc: "Run brew doctor" },
     ],
   },
 ];
@@ -77,7 +92,7 @@ export function HelpOverlay({ onClose }: HelpOverlayProps) {
   });
 
   return (
-    <ModalBox width={56} height={40} borderColor={colors.primary}>
+    <ModalBox width={56} borderColor={colors.primary}>
       <Box justifyContent="center" marginBottom={1}>
         <Text bold color={colors.primary} backgroundColor={colors.base}>
           Keyboard Shortcuts

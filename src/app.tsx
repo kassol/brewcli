@@ -37,52 +37,50 @@ function getPageHints(page: Page): KeyHint[] {
   switch (page) {
     case "dashboard":
       return [
+        { key: "S", label: "Search" },
         { key: "?", label: "Help" },
-        { key: "t", label: "Theme" },
-        { key: "q", label: "Quit" },
       ];
     case "formulae":
       return [
-        { key: "d", label: "Uninstall" },
         { key: "Enter", label: "Detail" },
+        { key: "d", label: "Uninstall" },
         { key: "u", label: "Upgrade" },
-        { key: "p", label: "Pin" },
-        { key: "v", label: "View" },
         { key: "/", label: "Filter" },
+        { key: "?", label: "Help" },
       ];
     case "casks":
       return [
-        { key: "d", label: "Uninstall" },
         { key: "Enter", label: "Detail" },
+        { key: "d", label: "Uninstall" },
         { key: "u", label: "Upgrade" },
         { key: "/", label: "Filter" },
+        { key: "?", label: "Help" },
       ];
     case "outdated":
       return [
         { key: "u", label: "Upgrade" },
-        { key: "U", label: "Upgrade All" },
-        { key: "Enter", label: "Detail" },
+        { key: "U", label: "All" },
         { key: "d", label: "Uninstall" },
+        { key: "?", label: "Help" },
       ];
     case "services":
       return [
         { key: "s", label: "Start/Stop" },
         { key: "R", label: "Restart" },
-        { key: "r", label: "Refresh" },
+        { key: "?", label: "Help" },
       ];
     case "taps":
       return [
-        { key: "d", label: "Remove" },
         { key: "a", label: "Add" },
-        { key: "r", label: "Refresh" },
+        { key: "d", label: "Remove" },
+        { key: "?", label: "Help" },
       ];
     case "cleanup":
       return [
         { key: "p", label: "Preview" },
         { key: "c", label: "Cleanup" },
-        { key: "a", label: "AutoRM Preview" },
-        { key: "A", label: "AutoRM" },
         { key: "D", label: "Doctor" },
+        { key: "?", label: "Help" },
       ];
     default:
       return [];
@@ -91,8 +89,8 @@ function getPageHints(page: Page): KeyHint[] {
 
 const sidebarHints: KeyHint[] = [
   { key: "j/k", label: "Navigate" },
-  { key: "Enter", label: "Select" },
-  { key: "Tab", label: "Main" },
+  { key: "Enter/l", label: "Main" },
+  { key: "?", label: "Help" },
 ];
 
 const modeHints: Record<string, KeyHint[]> = {
@@ -434,7 +432,7 @@ function AppContent() {
         setMode("help");
         return;
       }
-      if (input === "/") {
+      if (input === "S") {
         setMode("search");
         return;
       }
@@ -460,6 +458,9 @@ function AppContent() {
 
   const handlePageSelect = useCallback((key: string) => {
     setPage(key as Page);
+  }, []);
+
+  const handleFocusMain = useCallback(() => {
     setFocus("main");
   }, []);
 
@@ -549,6 +550,7 @@ function AppContent() {
           selectedIndex={sidebarIndex}
           onSelect={handlePageSelect}
           onChangeIndex={setSidebarIndex}
+          onFocusMain={handleFocusMain}
           isFocused={focus === "sidebar" && mode === "normal"}
         />
 

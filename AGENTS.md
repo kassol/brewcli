@@ -134,6 +134,7 @@ make test            # 运行测试
 
 ## 变更日志
 
+- 2026-03-19: 交互全面修复 — Sidebar j/k 即时切换页面 (无需 Enter)、快捷键三层收敛 (全局/列表通用/页面操作)、全局搜索改 S 键消除 / 冲突、ModalBox 自适应高度 (measureElement)、HelpOverlay 重构分组、StatusBar hints 精简
 - 2026-03-18: UX 改进 — 主题持久化 (~/.config/brewcli)、StatusBar 上下文快捷键提示、ModalBox 实底+投影、Toast 顶部通知、Outdated 页面增加卸载
 - 2026-03-18: 增加运行时主题切换 (T 快捷键)，Catppuccin Mocha/Latte 双主题，ThemeProvider + useTheme 架构
 - 2026-03-18: 增加设计上下文并做最终 UI/UX polish，修正表格溢出、状态提示与终端边界情况

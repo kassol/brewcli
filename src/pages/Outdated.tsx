@@ -18,7 +18,8 @@ type OutdatedRow = {
 
 export type OutdatedAction =
   | { type: "upgrade"; name: string; pkgType: "formula" | "cask" }
-  | { type: "upgrade_all" };
+  | { type: "upgrade_all" }
+  | { type: "uninstall"; name: string; pkgType: "formula" | "cask" };
 
 interface OutdatedProps {
   isFocused: boolean;
@@ -76,6 +77,10 @@ export function Outdated({ isFocused, onViewDetail, onAction }: OutdatedProps) {
       }
       if (input === "U") {
         onAction({ type: "upgrade_all" });
+        return;
+      }
+      if (input === "d") {
+        onAction({ type: "uninstall", name: row.name, pkgType: row.type });
         return;
       }
     },

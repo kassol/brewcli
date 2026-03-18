@@ -374,6 +374,17 @@ function AppContent() {
             },
           );
           break;
+        case "uninstall":
+          showConfirm(
+            "Uninstall Package",
+            `Uninstall ${action.name}?`,
+            () =>
+              action.pkgType === "cask"
+                ? brew.cask.uninstall(action.name).then(() => {})
+                : brew.formula.uninstall(action.name).then(() => {}),
+            true,
+          );
+          break;
       }
     },
     [showConfirm],

@@ -4,7 +4,7 @@ dev:
 	bun run src/index.tsx
 
 build:
-	bun build --compile src/index.tsx --outfile brewcli --external react-devtools-core
+	NODE_ENV=production bun build --compile --target=bun src/index.tsx --outfile brewcli
 
 install: build
 	cp brewcli /usr/local/bin/brewcli

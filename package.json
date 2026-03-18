@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "dev": "bun run src/index.tsx",
-    "build": "bun build --compile src/index.tsx --outfile brewcli --external react-devtools-core",
+    "build": "NODE_ENV=production bun build --compile --target=bun src/index.tsx --outfile brewcli",
     "typecheck": "bunx tsc --noEmit",
     "test": "bun test --timeout 60000"
   },
@@ -41,6 +41,7 @@
     "ink-select-input": "^6.2.0",
     "ink-spinner": "^5.0.0",
     "ink-text-input": "^6.0.0",
-    "react": "^19.2.4"
+    "react": "^19.2.4",
+    "react-devtools-core": "^7.0.1"
   }
 }

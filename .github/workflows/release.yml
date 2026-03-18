@@ -1,0 +1,153 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bunx tsc --noEmit
+
+      - name: Test
+        run: bun test --timeout 60000
+
+  build:
+    needs: verify
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-13
+            asset_suffix: macos-x64
+          - runner: macos-14
+            asset_suffix: macos-arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build binary
+        run: NODE_ENV=production bun build --compile --target=bun src/index.tsx --outfile brewcli
+
+      - name: Package release asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME}"
+          ASSET="brewcli-${VERSION}-${{ matrix.asset_suffix }}.tar.gz"
+          tar -czf "$ASSET" brewcli README.md LICENSE
+          shasum -a 256 "$ASSET" | awk '{print $1}' > "$ASSET.sha256"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_suffix }}
+          path: |
+            brewcli-${{ github.ref_name }}-${{ matrix.asset_suffix }}.tar.gz
+            brewcli-${{ github.ref_name }}-${{ matrix.asset_suffix }}.tar.gz.sha256
+
+  publish-release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: dist
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: dist/*.tar.gz
+
+  update-tap:
+    needs: publish-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout app repo
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: dist
+
+      - name: Render formula
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          ARM_ASSET="brewcli-${GITHUB_REF_NAME}-macos-arm64.tar.gz"
+          X64_ASSET="brewcli-${GITHUB_REF_NAME}-macos-x64.tar.gz"
+          ARM_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/${ARM_ASSET}"
+          X64_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/${X64_ASSET}"
+          ARM_SHA="$(cat dist/${ARM_ASSET}.sha256)"
+          X64_SHA="$(cat dist/${X64_ASSET}.sha256)"
+          python3 scripts/render_homebrew_formula.py \
+            --version "$VERSION" \
+            --arm-url "$ARM_URL" \
+            --arm-sha "$ARM_SHA" \
+            --x64-url "$X64_URL" \
+            --x64-sha "$X64_SHA" \
+            --output brewcli.rb
+
+      - name: Clone tap repository
+        env:
+          TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone "https://x-access-token:${TAP_GITHUB_TOKEN}@github.com/kassol/homebrew-tap.git" tap-repo
+
+      - name: Update tap formula
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p tap-repo/Formula
+          cp brewcli.rb tap-repo/Formula/brewcli.rb
+
+      - name: Commit and push tap update
+        env:
+          VERSION: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd tap-repo
+          if git diff --quiet; then
+            echo "No tap changes to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Formula/brewcli.rb
+          git commit -m "Update brewcli to ${VERSION#v}"
+          git push origin HEAD:main

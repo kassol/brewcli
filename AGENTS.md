@@ -7,7 +7,7 @@ Homebrew 交互式 TUI 管理工具。
 - Runtime: Bun
 - Language: TypeScript (strict)
 - TUI: Ink (React for CLI) + React 19
-- Build: `bun build --compile` -> 单二进制
+- Build: `bun build --compile --target=bun` -> 单二进制
 - Test: bun:test (74 tests)
 
 ## 目录结构
@@ -16,6 +16,7 @@ Homebrew 交互式 TUI 管理工具。
 src/
 ├── index.tsx              # 入口，alt-screen 管理
 ├── app.tsx                # 根组件，页面路由 + 全局状态 + 键绑定
+├── meta.ts                # 应用名/版本/描述元信息
 ├── theme.ts               # 颜色主题 (Catppuccin) + 布局常量
 ├── brew/                  # Homebrew CLI 抽象层
 │   ├── types.ts           # brew JSON v2 类型定义
@@ -67,7 +68,15 @@ tests/
 
 .github/
 └── workflows/
-    └── ci.yml             # macOS CI: typecheck + test + build
+    ├── ci.yml             # macOS CI: typecheck + test + build
+    └── release.yml        # tag 发布 + GitHub Release + Homebrew tap 更新
+
+docs/
+└── assets/                # README 截图与 demo GIF
+
+scripts/
+├── capture_demo.py        # 生成 README 截图/GIF
+└── render_homebrew_formula.py # 生成 tap formula
 
 README.md                  # 对外项目说明
 CONTRIBUTING.md            # 贡献约定
@@ -99,6 +108,7 @@ make test            # 运行测试
 - `useInput({ isActive })` 实现焦点级键绑定隔离
 - 全屏模式：alt-screen buffer + cursor 隐藏
 - Sidebar 分组：Packages / Updates / System 三个区域
+- 支持 `--help` / `--version`，非交互终端直接报错退出
 
 ### 数据流
 - 每个页面独立管理数据加载 (`useAsync` SWR hook)
@@ -123,6 +133,7 @@ make test            # 运行测试
 
 ## 变更日志
 
+- 2026-03-18: 增加截图/GIF、Release 工作流、Homebrew tap 发布链路
 - 2026-03-18: 增加 README / CONTRIBUTING / LICENSE / GitHub Actions CI，补齐仓库元信息
 - 2026-03-18: 增加 SWR 缓存/自动刷新/手动刷新，测试扩展到 74 项
 - 2026-03-18: 参考 Cork 优化 UI/UX，新增 Outdated/Help 页面，完整测试套件 (68 tests)

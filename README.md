@@ -2,7 +2,42 @@
 
 Interactive Homebrew TUI built with Bun, TypeScript, and Ink.
 
+[![CI](https://github.com/kassol/brewcli/actions/workflows/ci.yml/badge.svg)](https://github.com/kassol/brewcli/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/kassol/brewcli)](https://github.com/kassol/brewcli/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 `brewcli` aims to make common and awkward Homebrew workflows fast from the terminal: installed package browsing, dependency tracing, outdated package management, cask operations, services, taps, and maintenance tasks.
+
+## Install
+
+### Homebrew tap
+
+```bash
+brew tap kassol/tap
+brew install brewcli
+```
+
+### Direct binary
+
+Download the latest macOS binary from [GitHub Releases](https://github.com/kassol/brewcli/releases).
+
+## Demo
+
+![BrewCLI demo](docs/assets/demo.gif)
+
+## Screenshots
+
+### Dashboard
+
+![Dashboard](docs/assets/dashboard.png)
+
+### Formulae
+
+![Formulae](docs/assets/formulae.png)
+
+### Package Detail
+
+![Package detail](docs/assets/detail.png)
 
 ## Highlights
 
@@ -96,6 +131,13 @@ make build
 ./brewcli
 ```
 
+### Regenerate demo assets
+
+```bash
+python3 -m pip install --user pyte
+python3 scripts/capture_demo.py
+```
+
 ### Install locally
 
 ```bash
@@ -130,6 +172,13 @@ At the moment the project has `74` passing tests.
 - Multi-select upgrades from the outdated page
 - More complete package detail metadata
 - Additional pure logic tests around cache invalidation and refresh timing
+
+## Release Flow
+
+- Push a tag like `v0.1.0`
+- GitHub Actions runs typecheck, tests, and builds macOS release assets
+- The release workflow publishes binaries to GitHub Releases
+- The same workflow updates `kassol/homebrew-tap` with a fresh `brewcli` formula
 
 ## Contributing
 

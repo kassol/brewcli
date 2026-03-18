@@ -28,4 +28,4 @@ jobs:
         run: bun test --timeout 60000
 
       - name: Build
-        run: bun build --compile src/index.tsx --outfile brewcli --external react-devtools-core
+        run: NODE_ENV=production bun build --compile --target=bun src/index.tsx --outfile brewcli

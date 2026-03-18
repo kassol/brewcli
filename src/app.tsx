@@ -5,7 +5,8 @@ import { ThemeProvider, useTheme } from "./hooks/useTheme.tsx";
 import { useTerminalSize } from "./hooks/useTerminalSize.ts";
 import { invalidateCache } from "./hooks/useAsync.ts";
 import { Sidebar, type SidebarSection } from "./components/Sidebar.tsx";
-import { StatusBar } from "./components/StatusBar.tsx";
+import { StatusBar, type KeyHint } from "./components/StatusBar.tsx";
+import { Toast, toastDuration, type ToastMessage } from "./components/Toast.tsx";
 import { SearchBar } from "./components/SearchBar.tsx";
 import { ConfirmDialog } from "./components/ConfirmDialog.tsx";
 import { HelpOverlay } from "./components/HelpOverlay.tsx";
@@ -31,6 +32,88 @@ interface ConfirmState {
   destructive: boolean;
   action: () => Promise<void>;
 }
+
+function getPageHints(page: Page): KeyHint[] {
+  switch (page) {
+    case "dashboard":
+      return [
+        { key: "?", label: "Help" },
+        { key: "t", label: "Theme" },
+        { key: "q", label: "Quit" },
+      ];
+    case "formulae":
+      return [
+        { key: "d", label: "Uninstall" },
+        { key: "Enter", label: "Detail" },
+        { key: "u", label: "Upgrade" },
+        { key: "p", label: "Pin" },
+        { key: "v", label: "View" },
+        { key: "/", label: "Filter" },
+      ];
+    case "casks":
+      return [
+        { key: "d", label: "Uninstall" },
+        { key: "Enter", label: "Detail" },
+        { key: "u", label: "Upgrade" },
+        { key: "/", label: "Filter" },
+      ];
+    case "outdated":
+      return [
+        { key: "u", label: "Upgrade" },
+        { key: "U", label: "Upgrade All" },
+        { key: "Enter", label: "Detail" },
+        { key: "d", label: "Uninstall" },
+      ];
+    case "services":
+      return [
+        { key: "s", label: "Start/Stop" },
+        { key: "R", label: "Restart" },
+        { key: "r", label: "Refresh" },
+      ];
+    case "taps":
+      return [
+        { key: "d", label: "Remove" },
+        { key: "a", label: "Add" },
+        { key: "r", label: "Refresh" },
+      ];
+    case "cleanup":
+      return [
+        { key: "p", label: "Preview" },
+        { key: "c", label: "Cleanup" },
+        { key: "a", label: "AutoRM Preview" },
+        { key: "A", label: "AutoRM" },
+        { key: "D", label: "Doctor" },
+      ];
+    default:
+      return [];
+  }
+}
+
+const sidebarHints: KeyHint[] = [
+  { key: "j/k", label: "Navigate" },
+  { key: "Enter", label: "Select" },
+  { key: "Tab", label: "Main" },
+];
+
+const modeHints: Record<string, KeyHint[]> = {
+  confirm: [
+    { key: "y/Enter", label: "Confirm" },
+    { key: "n/Esc", label: "Cancel" },
+  ],
+  search: [
+    { key: "Enter", label: "Select" },
+    { key: "Esc", label: "Close" },
+    { key: "Up/Down", label: "Navigate" },
+  ],
+  help: [
+    { key: "Esc", label: "Close" },
+    { key: "?", label: "Close" },
+  ],
+  input: [
+    { key: "Enter", label: "Submit" },
+    { key: "Esc", label: "Cancel" },
+  ],
+};
 
 export function App() {
   return (
@@ -77,7 +160,8 @@ function AppContent() {
   const [mode, setMode] = useState<Mode>("normal");
   const [focus, setFocus] = useState<Focus>("sidebar");
   const [sidebarIndex, setSidebarIndex] = useState(0);
-  const [notification, setNotification] = useState<string | null>(null);
+  const [toast, setToast] = useState<ToastMessage | null>(null);
+  const toastIdRef = React.useRef(0);
   const [loading, setLoading] = useState(false);
   const [confirmState, setConfirmState] = useState<ConfirmState | null>(null);
 
@@ -93,15 +177,18 @@ function AppContent() {
     onSubmit: (value: string) => void;
   } | null>(null);
 
-  // Auto-clear notification
+  // Auto-clear toast
   useEffect(() => {
-    if (notification) {
-      const timer = setTimeout(() => setNotification(null), 3000);
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), toastDuration(toast.type));
       return () => clearTimeout(timer);
     }
-  }, [notification]);
+  }, [toast]);
 
-  const notify = useCallback((msg: string) => setNotification(msg), []);
+  const notify = useCallback((msg: string, type: "success" | "error" | "info" = "success") => {
+    toastIdRef.current += 1;
+    setToast({ id: toastIdRef.current, text: msg, type });
+  }, []);
 
   const showConfirm = useCallback(
     (title: string, message: string, action: () => Promise<void>, destructive = false) => {
@@ -118,9 +205,9 @@ function AppContent() {
     try {
       await confirmState.action();
       invalidateCache(); // Force all mounted hooks to re-fetch fresh data
-      notify(`${confirmState.title} completed`);
+      notify(`${confirmState.title} completed`, "success");
     } catch (e) {
-      notify(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      notify(`Error: ${e instanceof Error ? e.message : String(e)}`, "error");
     } finally {
       setLoading(false);
       setConfirmState(null);
@@ -173,10 +260,10 @@ function AppContent() {
           );
           break;
         case "pin":
-          brew.formula.pin(action.name).then(() => { invalidateCache(); notify(`Pinned ${action.name}`); });
+          brew.formula.pin(action.name).then(() => { invalidateCache(); notify(`Pinned ${action.name}`, "success"); });
           break;
         case "unpin":
-          brew.formula.unpin(action.name).then(() => { invalidateCache(); notify(`Unpinned ${action.name}`); });
+          brew.formula.unpin(action.name).then(() => { invalidateCache(); notify(`Unpinned ${action.name}`, "success"); });
           break;
       }
     },
@@ -315,10 +402,10 @@ function AppContent() {
               : brew.formula.upgrade(action.name).then(() => {}));
           break;
         case "pin":
-          brew.formula.pin(action.name).then(() => { invalidateCache(); notify(`Pinned ${action.name}`); });
+          brew.formula.pin(action.name).then(() => { invalidateCache(); notify(`Pinned ${action.name}`, "success"); });
           break;
         case "unpin":
-          brew.formula.unpin(action.name).then(() => { invalidateCache(); notify(`Unpinned ${action.name}`); });
+          brew.formula.unpin(action.name).then(() => { invalidateCache(); notify(`Unpinned ${action.name}`, "success"); });
           break;
       }
     },
@@ -366,6 +453,16 @@ function AppContent() {
   }, []);
 
   const mainFocused = focus === "main" && mode === "normal";
+
+  const hints = useMemo<KeyHint[]>(() => {
+    if (mode !== "normal" && mode !== "detail") {
+      return modeHints[mode] ?? [];
+    }
+    if (focus === "sidebar") {
+      return sidebarHints;
+    }
+    return getPageHints(page);
+  }, [mode, focus, page]);
 
   if (width < MIN_TERMINAL_WIDTH || height < MIN_TERMINAL_HEIGHT) {
     return (
@@ -462,10 +559,12 @@ function AppContent() {
       <StatusBar
         page={page}
         mode={mode}
-        notification={notification}
+        hints={hints}
         loading={loading}
-        colorScheme={colorScheme}
       />
+
+      {/* Toast notification */}
+      <Toast message={toast} terminalWidth={width} />
 
       {/* Overlays */}
       {mode === "search" && (

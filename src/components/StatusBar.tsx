@@ -1,24 +1,18 @@
 import React from "react";
 import { Box, Text } from "ink";
-import type { ColorScheme } from "../theme.ts";
 import { useTheme } from "../hooks/useTheme.tsx";
+
+export interface KeyHint {
+  key: string;
+  label: string;
+}
 
 interface StatusBarProps {
   page: string;
   mode: string;
-  notification?: string | null;
+  hints: KeyHint[];
   loading?: boolean;
-  colorScheme?: ColorScheme;
 }
-
-const keyHints: Record<string, string> = {
-  normal:   "[/] Search  [?] Help  [Tab] Focus  [t] Theme  [q] Quit",
-  search: "[Enter] Select  [Esc] Close  [Up/Down] Navigate",
-  detail: "[Esc] Back  [Tab] Tabs  [i] Install  [d] Uninstall  [u] Upgrade",
-  confirm: "[y] Confirm  [n] Cancel",
-  help: "[Esc] or [?] Close help",
-  input: "[Enter] Submit  [Esc] Cancel",
-};
 
 const pageLabels: Record<string, string> = {
   dashboard: "Dashboard",
@@ -30,9 +24,10 @@ const pageLabels: Record<string, string> = {
   cleanup: "Cleanup",
 };
 
-export function StatusBar({ page, mode, notification, loading, colorScheme }: StatusBarProps) {
-  const { colors } = useTheme();
+export function StatusBar({ page, mode, hints, loading }: StatusBarProps) {
+  const { colors, colorScheme } = useTheme();
   const pageLabel = pageLabels[page] ?? page;
+
   return (
     <Box
       borderStyle="single"
@@ -44,27 +39,19 @@ export function StatusBar({ page, mode, notification, loading, colorScheme }: St
       paddingX={1}
       justifyContent="space-between"
     >
-      <Box>
-        <Text color={colors.muted}>
-          {keyHints[mode] ?? keyHints.normal}
-        </Text>
+      <Box gap={1}>
+        {hints.map((hint) => (
+          <Box key={hint.key}>
+            <Text bold color={colors.accent}>[{hint.key}]</Text>
+            <Text color={colors.muted}>{hint.label}</Text>
+          </Box>
+        ))}
       </Box>
 
       <Box gap={2}>
-        {notification && (
-          <Text
-            color={
-              notification.startsWith("Error")
-                ? colors.error
-                : colors.success
-            }
-          >
-            {notification}
-          </Text>
-        )}
         {loading && <Text color={colors.warning}>Working...</Text>}
         <Text color={colors.muted}>{pageLabel}</Text>
-        <Text color={colors.muted}>{colorScheme === "light" ? "light" : "dark"}</Text>
+        <Text color={colors.muted}>{colorScheme}</Text>
       </Box>
     </Box>
   );

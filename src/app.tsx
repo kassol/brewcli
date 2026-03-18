@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { Box, useApp, useInput } from "ink";
-import { colors } from "./theme.ts";
+import { Box, Text, useApp, useInput } from "ink";
+import { colors, MIN_TERMINAL_HEIGHT, MIN_TERMINAL_WIDTH } from "./theme.ts";
 import { useTerminalSize } from "./hooks/useTerminalSize.ts";
 import { invalidateCache } from "./hooks/useAsync.ts";
 import { Sidebar, type SidebarSection } from "./components/Sidebar.tsx";
@@ -32,7 +32,7 @@ interface ConfirmState {
 
 const sidebarSections: SidebarSection[] = [
   {
-    header: "-- Packages --",
+    header: "Packages",
     items: [
       { key: "dashboard", label: "Dashboard" },
       { key: "formulae", label: "Formulae" },
@@ -40,13 +40,13 @@ const sidebarSections: SidebarSection[] = [
     ],
   },
   {
-    header: "-- Updates --",
+    header: "Updates",
     items: [
       { key: "outdated", label: "Outdated", badgeColor: colors.warning },
     ],
   },
   {
-    header: "-- System --",
+    header: "System",
     items: [
       { key: "services", label: "Services" },
       { key: "taps", label: "Taps" },
@@ -96,7 +96,7 @@ export function App() {
     try {
       await confirmState.action();
       invalidateCache(); // Force all mounted hooks to re-fetch fresh data
-      notify("Done");
+      notify(`${confirmState.title} completed`);
     } catch (e) {
       notify(`Error: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
@@ -323,6 +323,31 @@ export function App() {
   }, []);
 
   const mainFocused = focus === "main" && mode === "normal";
+
+  if (width < MIN_TERMINAL_WIDTH || height < MIN_TERMINAL_HEIGHT) {
+    return (
+      <Box alignItems="center" justifyContent="center" width={width} height={height}>
+        <Box
+          flexDirection="column"
+          borderStyle="round"
+          borderColor={colors.warning}
+          paddingX={2}
+          paddingY={1}
+          width={58}
+        >
+          <Text color={colors.warning} bold>
+            Terminal too small
+          </Text>
+          <Text color={colors.subtext}>
+            Resize to at least {MIN_TERMINAL_WIDTH}x{MIN_TERMINAL_HEIGHT} to use brewcli comfortably.
+          </Text>
+          <Box marginTop={1}>
+            <Text color={colors.muted}>Current size: {width}x{height}</Text>
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
 
   const renderPage = () => {
     switch (page) {

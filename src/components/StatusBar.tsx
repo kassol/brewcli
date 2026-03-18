@@ -17,7 +17,18 @@ const keyHints: Record<string, string> = {
   help: "[Esc] or [?] Close help",
 };
 
+const pageLabels: Record<string, string> = {
+  dashboard: "Dashboard",
+  formulae: "Formulae",
+  casks: "Casks",
+  outdated: "Outdated",
+  services: "Services",
+  taps: "Taps",
+  cleanup: "Cleanup",
+};
+
 export function StatusBar({ page, mode, notification, loading }: StatusBarProps) {
+  const pageLabel = pageLabels[page] ?? page;
   return (
     <Box
       borderStyle="single"
@@ -47,8 +58,8 @@ export function StatusBar({ page, mode, notification, loading }: StatusBarProps)
             {notification}
           </Text>
         )}
-        {loading && <Text color={colors.warning}>Loading...</Text>}
-        <Text color={colors.muted}>{page}</Text>
+        {loading && <Text color={colors.warning}>Working...</Text>}
+        <Text color={colors.muted}>{pageLabel}</Text>
       </Box>
     </Box>
   );

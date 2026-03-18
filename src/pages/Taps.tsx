@@ -5,7 +5,7 @@ import { useAsync } from "../hooks/useAsync.ts";
 import { useTerminalSize } from "../hooks/useTerminalSize.ts";
 import { Table, type Column } from "../components/Table.tsx";
 import { Loading, ErrorDisplay } from "../components/Loading.tsx";
-import { STATUS_BAR_HEIGHT } from "../theme.ts";
+import { SIDEBAR_WIDTH, STATUS_BAR_HEIGHT } from "../theme.ts";
 import * as brew from "../brew/index.ts";
 
 interface TapRow {
@@ -35,7 +35,7 @@ export function Taps({ isFocused, onAction }: TapsProps) {
       );
     },
   );
-  const { height } = useTerminalSize();
+  const { height, width } = useTerminalSize();
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   useInput(
@@ -88,7 +88,7 @@ export function Taps({ isFocused, onAction }: TapsProps) {
             Taps
           </Text>
           <Text color={colors.muted}>({data?.length ?? 0})</Text>
-          {refreshing && <Text color={colors.warning}>refreshing...</Text>}
+          {refreshing && <Text color={colors.warning}>Refreshing</Text>}
         </Box>
         <Text color={colors.muted}>
           [a] Add Tap  [d] Remove  [r] Refresh
@@ -102,6 +102,7 @@ export function Taps({ isFocused, onAction }: TapsProps) {
         onChangeIndex={setSelectedIndex}
         isFocused={isFocused}
         height={tableHeight}
+        width={Math.max(56, width - SIDEBAR_WIDTH - 4)}
         emptyMessage="No taps configured"
       />
     </Box>

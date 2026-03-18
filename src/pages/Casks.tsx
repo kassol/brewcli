@@ -5,7 +5,7 @@ import { useAsync } from "../hooks/useAsync.ts";
 import { useTerminalSize } from "../hooks/useTerminalSize.ts";
 import { Table, type Column, type SortDirection } from "../components/Table.tsx";
 import { Loading, ErrorDisplay } from "../components/Loading.tsx";
-import { STATUS_BAR_HEIGHT } from "../theme.ts";
+import { SIDEBAR_WIDTH, STATUS_BAR_HEIGHT } from "../theme.ts";
 import * as brew from "../brew/index.ts";
 import type { CaskInfo } from "../brew/types.ts";
 
@@ -27,7 +27,7 @@ export function Casks({ isFocused, onViewDetail, onAction }: CasksProps) {
     "casks:installed",
     () => brew.cask.listInstalled(),
   );
-  const { height } = useTerminalSize();
+  const { height, width } = useTerminalSize();
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [filter, setFilter] = useState("");
@@ -179,7 +179,7 @@ export function Casks({ isFocused, onViewDetail, onAction }: CasksProps) {
             Casks
           </Text>
           <Text color={colors.muted}>({sortedData.length})</Text>
-          {refreshing && <Text color={colors.warning}> refreshing...</Text>}
+          {refreshing && <Text color={colors.warning}>Refreshing</Text>}
         </Box>
         <Box gap={1}>
           {filterMode ? (
@@ -192,7 +192,7 @@ export function Casks({ isFocused, onViewDetail, onAction }: CasksProps) {
             <Text color={colors.muted}>filter: {filter}</Text>
           ) : null}
           <Text color={colors.muted}>
-            [1-3] Sort [f] Filter [r] Refresh
+            [f] Filter  [r] Refresh  [1-3] Sort
           </Text>
         </Box>
       </Box>
@@ -208,6 +208,7 @@ export function Casks({ isFocused, onViewDetail, onAction }: CasksProps) {
         sortColumn={sortKey}
         sortDirection={sortDir}
         onSort={handleSort}
+        width={Math.max(56, width - SIDEBAR_WIDTH - 4)}
         emptyMessage={
           filter ? "No casks match filter" : "No casks installed"
         }

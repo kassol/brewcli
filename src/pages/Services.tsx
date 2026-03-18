@@ -5,7 +5,7 @@ import { useAsync } from "../hooks/useAsync.ts";
 import { useTerminalSize } from "../hooks/useTerminalSize.ts";
 import { Table, type Column } from "../components/Table.tsx";
 import { Loading, ErrorDisplay } from "../components/Loading.tsx";
-import { STATUS_BAR_HEIGHT } from "../theme.ts";
+import { SIDEBAR_WIDTH, STATUS_BAR_HEIGHT } from "../theme.ts";
 import * as brew from "../brew/index.ts";
 import type { ServiceInfo } from "../brew/types.ts";
 
@@ -24,7 +24,7 @@ export function Services({ isFocused, onAction }: ServicesProps) {
     "services",
     () => brew.service.list(),
   );
-  const { height } = useTerminalSize();
+  const { height, width } = useTerminalSize();
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   useInput(
@@ -101,7 +101,7 @@ export function Services({ isFocused, onAction }: ServicesProps) {
             Services
           </Text>
           <Text color={colors.muted}>({data?.length ?? 0})</Text>
-          {refreshing && <Text color={colors.warning}>refreshing...</Text>}
+          {refreshing && <Text color={colors.warning}>Refreshing</Text>}
         </Box>
         <Text color={colors.muted}>
           [s] Start/Stop  [R] Restart  [r] Refresh
@@ -115,6 +115,7 @@ export function Services({ isFocused, onAction }: ServicesProps) {
         onChangeIndex={setSelectedIndex}
         isFocused={isFocused}
         height={tableHeight}
+        width={Math.max(56, width - SIDEBAR_WIDTH - 4)}
         emptyMessage="No services found. Install a formula with a service (e.g. postgresql, redis)"
       />
     </Box>

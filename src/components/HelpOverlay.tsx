@@ -30,7 +30,6 @@ const sections: { title: string; entries: HelpEntry[] }[] = [
       { key: "Enter", desc: "View details / select" },
       { key: "f", desc: "Filter list" },
       { key: "Esc", desc: "Clear filter / close overlay" },
-      { key: "Space", desc: "Toggle checkbox" },
     ],
   },
   {
@@ -68,8 +67,8 @@ const sections: { title: string; entries: HelpEntry[] }[] = [
 ];
 
 export function HelpOverlay({ onClose }: HelpOverlayProps) {
-  useInput((_input, key) => {
-    if (key.escape) {
+  useInput((input, key) => {
+    if (key.escape || input === "?") {
       onClose();
     }
   });

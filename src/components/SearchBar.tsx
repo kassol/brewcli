@@ -77,20 +77,28 @@ export function SearchBar({ onSelect, onClose, width }: SearchBarProps) {
       borderStyle="round"
       borderColor={colors.primary}
       width={boxWidth}
-      paddingX={1}
+      paddingX={2}
+      paddingY={1}
     >
-      <Box>
+      <Box flexDirection="column">
         <Text color={colors.primary} bold>
-          Search:{" "}
+          Search Packages
+        </Text>
+        <Text color={colors.muted}>Formulae and casks, 2+ characters</Text>
+      </Box>
+
+      <Box marginTop={1}>
+        <Text color={colors.accent} bold>
+          Query:{" "}
         </Text>
         <TextInput value={query} onChange={handleChange} />
-        {loading && <Text color={colors.muted}> ...</Text>}
+        {loading && <Text color={colors.muted}> searching...</Text>}
       </Box>
 
       {results.length > 0 && (
         <Box flexDirection="column" marginTop={1}>
           {results.slice(0, 15).map((r, i) => (
-            <Box key={`${r.type}-${r.name}`}>
+            <Box key={`${r.type}-${r.name}`} justifyContent="space-between">
               <Text
                 inverse={i === selectedIndex}
                 color={
@@ -103,22 +111,33 @@ export function SearchBar({ onSelect, onClose, width }: SearchBarProps) {
               >
                 {i === selectedIndex ? "> " : "  "}
                 [{r.type === "formula" ? "F" : "C"}] {r.name}
-                {r.installed ? " (installed)" : ""}
+              </Text>
+              <Text
+                inverse={i === selectedIndex}
+                color={i === selectedIndex ? undefined : r.installed ? colors.success : colors.muted}
+              >
+                {r.installed ? "installed" : r.type}
               </Text>
             </Box>
           ))}
         </Box>
       )}
 
+      {query.length > 0 && query.length < 2 && (
+        <Box marginTop={1}>
+          <Text color={colors.muted}>Keep typing to search...</Text>
+        </Box>
+      )}
+
       {query.length >= 2 && !loading && results.length === 0 && (
         <Box marginTop={1}>
-          <Text color={colors.muted}>No results found</Text>
+          <Text color={colors.muted}>No packages matched your query</Text>
         </Box>
       )}
 
       <Box marginTop={1}>
         <Text color={colors.muted}>
-          [Enter] Select  [Esc] Close  [Up/Down] Navigate
+          [Enter] Open  [Esc] Close  [Up/Down] Move
         </Text>
       </Box>
     </Box>

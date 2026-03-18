@@ -18,7 +18,7 @@ export function ConfirmDialog({
   destructive = false,
 }: ConfirmDialogProps) {
   useInput((input, key) => {
-    if (input === "y" || input === "Y") {
+    if (input === "y" || input === "Y" || key.return) {
       onConfirm();
     }
     if (input === "n" || input === "N" || key.escape) {
@@ -33,20 +33,23 @@ export function ConfirmDialog({
       borderColor={destructive ? colors.error : colors.warning}
       paddingX={2}
       paddingY={1}
-      width={50}
+      width={58}
     >
       <Text bold color={destructive ? colors.error : colors.warning}>
         {title}
       </Text>
-      <Box marginY={1}>
-        <Text>{message}</Text>
+      <Box marginY={1} flexDirection="column">
+        <Text color={colors.text}>{message}</Text>
+        <Text color={colors.muted}>
+          {destructive ? "This action may be hard to undo." : "Press Enter or Y to continue."}
+        </Text>
       </Box>
       <Box gap={2}>
         <Text color={destructive ? colors.error : colors.success} bold>
-          [Y]es
+          [Enter / Y] Confirm
         </Text>
         <Text color={colors.muted} bold>
-          [N]o
+          [Esc / N] Cancel
         </Text>
       </Box>
     </Box>

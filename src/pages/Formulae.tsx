@@ -5,7 +5,7 @@ import { useAsync } from "../hooks/useAsync.ts";
 import { useTerminalSize } from "../hooks/useTerminalSize.ts";
 import { Table, type Column, type SortDirection } from "../components/Table.tsx";
 import { Loading, ErrorDisplay } from "../components/Loading.tsx";
-import { STATUS_BAR_HEIGHT } from "../theme.ts";
+import { SIDEBAR_WIDTH, STATUS_BAR_HEIGHT } from "../theme.ts";
 import * as brew from "../brew/index.ts";
 import type { FormulaInfo } from "../brew/types.ts";
 
@@ -44,7 +44,7 @@ export function Formulae({ isFocused, onViewDetail, onAction }: FormulaeProps) {
     "formulae:installed",
     () => brew.formula.listInstalled(),
   );
-  const { height } = useTerminalSize();
+  const { height, width } = useTerminalSize();
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [filter, setFilter] = useState("");
@@ -238,7 +238,7 @@ export function Formulae({ isFocused, onViewDetail, onAction }: FormulaeProps) {
           <Text color={colors.accent}>
             [{viewModeLabels[viewMode]}]
           </Text>
-          {refreshing && <Text color={colors.warning}> refreshing...</Text>}
+          {refreshing && <Text color={colors.warning}>Refreshing</Text>}
         </Box>
         <Box gap={1}>
           {filterMode ? (
@@ -251,7 +251,7 @@ export function Formulae({ isFocused, onViewDetail, onAction }: FormulaeProps) {
             <Text color={colors.muted}>filter: {filter}</Text>
           ) : null}
           <Text color={colors.muted}>
-            [t] View [f] Filter [1-4] Sort
+            [t] View  [f] Filter  [r] Refresh  [1-4] Sort
           </Text>
         </Box>
       </Box>
@@ -267,6 +267,7 @@ export function Formulae({ isFocused, onViewDetail, onAction }: FormulaeProps) {
         sortColumn={sortKey}
         sortDirection={sortDir}
         onSort={handleSort}
+        width={Math.max(56, width - SIDEBAR_WIDTH - 4)}
         emptyMessage={
           filter
             ? "No formulae match filter"

@@ -1,13 +1,12 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
 import { colors } from "../theme.ts";
 import { useAsync } from "../hooks/useAsync.ts";
 import { useTerminalSize } from "../hooks/useTerminalSize.ts";
 import { Table, type Column } from "../components/Table.tsx";
 import { Loading, ErrorDisplay } from "../components/Loading.tsx";
-import { STATUS_BAR_HEIGHT } from "../theme.ts";
+import { SIDEBAR_WIDTH, STATUS_BAR_HEIGHT } from "../theme.ts";
 import * as brew from "../brew/index.ts";
-import type { OutdatedFormula, OutdatedCask } from "../brew/types.ts";
 
 type OutdatedRow = {
   name: string;
@@ -53,9 +52,8 @@ export function Outdated({ isFocused, onViewDetail, onAction }: OutdatedProps) {
     return rows;
   });
 
-  const { height } = useTerminalSize();
+  const { height, width } = useTerminalSize();
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [checkedIndices, setCheckedIndices] = useState<Set<number>>(new Set());
 
   useInput(
     (input, key) => {
@@ -140,10 +138,10 @@ export function Outdated({ isFocused, onViewDetail, onAction }: OutdatedProps) {
             Outdated Packages
           </Text>
           <Text color={colors.muted}>({data?.length ?? 0})</Text>
-          {refreshing && <Text color={colors.warning}> checking...</Text>}
+          {refreshing && <Text color={colors.warning}>Refreshing</Text>}
         </Box>
         <Text color={colors.muted}>
-          [u] Upgrade  [U] Upgrade All  [r] Refresh
+          [Enter] Open  [u] Upgrade  [U] Upgrade All  [r] Refresh
         </Text>
       </Box>
 
@@ -171,15 +169,7 @@ export function Outdated({ isFocused, onViewDetail, onAction }: OutdatedProps) {
           onSelect={(row) => onViewDetail(row.name, row.type)}
           isFocused={isFocused}
           height={tableHeight}
-          checkedIndices={checkedIndices}
-          onToggleCheck={(i) => {
-            setCheckedIndices((prev) => {
-              const next = new Set(prev);
-              if (next.has(i)) next.delete(i);
-              else next.add(i);
-              return next;
-            });
-          }}
+          width={Math.max(56, width - SIDEBAR_WIDTH - 4)}
         />
       )}
     </Box>

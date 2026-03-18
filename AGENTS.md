@@ -81,6 +81,7 @@ scripts/
 README.md                  # 对外项目说明
 CONTRIBUTING.md            # 贡献约定
 LICENSE                    # MIT 许可证
+.impeccable.md             # 持久化设计上下文
 ```
 
 ## 常用命令
@@ -133,6 +134,7 @@ make test            # 运行测试
 
 ## 变更日志
 
+- 2026-03-18: 增加设计上下文并做最终 UI/UX polish，修正表格溢出、状态提示与终端边界情况
 - 2026-03-18: 增加截图/GIF、Release 工作流、Homebrew tap 发布链路
 - 2026-03-18: 增加 README / CONTRIBUTING / LICENSE / GitHub Actions CI，补齐仓库元信息
 - 2026-03-18: 增加 SWR 缓存/自动刷新/手动刷新，测试扩展到 74 项

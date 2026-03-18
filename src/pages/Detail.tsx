@@ -8,6 +8,13 @@ import { Loading, ErrorDisplay } from "../components/Loading.tsx";
 import * as brew from "../brew/index.ts";
 import type { FormulaInfo, CaskInfo } from "../brew/types.ts";
 
+function truncate(value: string, max: number): string {
+  if (max <= 0) return "";
+  if (value.length <= max) return value;
+  if (max === 1) return "~";
+  return `${value.slice(0, max - 1)}~`;
+}
+
 type DetailTab = "info" | "deps" | "uses";
 
 interface DetailProps {
@@ -43,13 +50,13 @@ export function Detail({ name, type, onClose, onAction }: DetailProps) {
       { enabled: type === "cask", ttl: 60_000 },
     );
 
-  const { data: depsTree } = useAsync(
+  const { data: depsTree, loading: depsLoading } = useAsync(
     `detail:deps:${name}`,
     () => brew.formula.depsTree(name),
     { enabled: type === "formula" && tab === "deps", ttl: 120_000 },
   );
 
-  const { data: usedBy } = useAsync(
+  const { data: usedBy, loading: usesLoading } = useAsync(
     `detail:uses:${name}`,
     () => brew.formula.uses(name),
     { enabled: type === "formula" && tab === "uses", ttl: 120_000 },
@@ -110,10 +117,10 @@ export function Detail({ name, type, onClose, onAction }: DetailProps) {
 
   const renderInfo = () => {
     if (type === "formula" && formulaInfo) {
-      return <FormulaDetail info={formulaInfo} />;
+      return <FormulaDetail info={formulaInfo} valueWidth={valueWidth} />;
     }
     if (type === "cask" && caskInfo) {
-      return <CaskDetail info={caskInfo} />;
+      return <CaskDetail info={caskInfo} valueWidth={valueWidth} />;
     }
     return null;
   };
@@ -128,6 +135,7 @@ export function Detail({ name, type, onClose, onAction }: DetailProps) {
       : [{ key: "info", label: "Info" }];
 
   const contentHeight = height - 8;
+  const valueWidth = Math.max(24, width - 52);
 
   return (
     <Box
@@ -142,7 +150,7 @@ export function Detail({ name, type, onClose, onAction }: DetailProps) {
         <Text bold color={colors.primary}>
           {name} ({type})
         </Text>
-        <Text color={colors.muted}>[Esc] Close  [Tab] Switch tab</Text>
+        <Text color={colors.muted}>[Esc] Close  [Tab] Switch Tabs</Text>
       </Box>
 
       {/* Tabs */}
@@ -164,17 +172,23 @@ export function Detail({ name, type, onClose, onAction }: DetailProps) {
       <Box flexDirection="column" flexGrow={1}>
         {tab === "info" && renderInfo()}
         {tab === "deps" && (
-          <Tree
-            data={treeData}
-            isFocused={true}
-            height={contentHeight}
-            selectedIndex={treeIndex}
-            onChangeIndex={setTreeIndex}
-          />
+          depsLoading ? (
+            <Loading message="Loading dependency tree..." />
+          ) : (
+            <Tree
+              data={treeData}
+              isFocused={true}
+              height={contentHeight}
+              selectedIndex={treeIndex}
+              onChangeIndex={setTreeIndex}
+            />
+          )
         )}
         {tab === "uses" && (
           <Box flexDirection="column">
-            {usedBy && usedBy.length > 0 ? (
+            {usesLoading ? (
+              <Loading message="Loading reverse dependencies..." />
+            ) : usedBy && usedBy.length > 0 ? (
               usedBy.map((u) => (
                 <Text key={u} color={colors.text}>
                   {" "}
@@ -212,7 +226,7 @@ function InfoRow({ label, value, color }: { label: string; value: string; color?
   );
 }
 
-function FormulaDetail({ info }: { info: FormulaInfo }) {
+function FormulaDetail({ info, valueWidth }: { info: FormulaInfo; valueWidth: number }) {
   const installed = info.installed[0];
   const installedDate = installed
     ? new Date(installed.time * 1000).toLocaleDateString()
@@ -220,14 +234,14 @@ function FormulaDetail({ info }: { info: FormulaInfo }) {
 
   return (
     <Box flexDirection="column" gap={0}>
-      <InfoRow label="Description" value={info.desc || "-"} />
-      <InfoRow label="Homepage" value={info.homepage} color={colors.accent} />
+      <InfoRow label="Description" value={truncate(info.desc || "-", valueWidth)} />
+      <InfoRow label="Homepage" value={truncate(info.homepage, valueWidth)} color={colors.accent} />
       <InfoRow label="Version" value={info.versions.stable ?? "-"} />
       <InfoRow label="License" value={info.license ?? "-"} />
-      <InfoRow label="Tap" value={info.tap ?? "-"} />
+      <InfoRow label="Tap" value={truncate(info.tap ?? "-", valueWidth)} />
       <InfoRow label="Installed" value={installedDate} />
       <InfoRow
-        label="Installed by"
+        label="Install Reason"
         value={
           installed?.installed_on_request ? "request" : "dependency"
         }
@@ -246,15 +260,15 @@ function FormulaDetail({ info }: { info: FormulaInfo }) {
         label="Dependencies"
         value={
           info.dependencies.length > 0
-            ? info.dependencies.join(", ")
+            ? truncate(info.dependencies.join(", "), valueWidth)
             : "none"
         }
       />
       <InfoRow
-        label="Build deps"
+        label="Build Deps"
         value={
           info.build_dependencies.length > 0
-            ? info.build_dependencies.join(", ")
+            ? truncate(info.build_dependencies.join(", "), valueWidth)
             : "none"
         }
       />
@@ -268,14 +282,14 @@ function FormulaDetail({ info }: { info: FormulaInfo }) {
   );
 }
 
-function CaskDetail({ info }: { info: CaskInfo }) {
+function CaskDetail({ info, valueWidth }: { info: CaskInfo; valueWidth: number }) {
   return (
     <Box flexDirection="column" gap={0}>
-      <InfoRow label="Name" value={info.name.join(", ") || info.token} />
-      <InfoRow label="Description" value={info.desc || "-"} />
-      <InfoRow label="Homepage" value={info.homepage} color={colors.accent} />
+      <InfoRow label="Name" value={truncate(info.name.join(", ") || info.token, valueWidth)} />
+      <InfoRow label="Description" value={truncate(info.desc || "-", valueWidth)} />
+      <InfoRow label="Homepage" value={truncate(info.homepage, valueWidth)} color={colors.accent} />
       <InfoRow label="Version" value={info.version ?? "-"} />
-      <InfoRow label="Tap" value={info.tap ?? "-"} />
+      <InfoRow label="Tap" value={truncate(info.tap ?? "-", valueWidth)} />
       <InfoRow
         label="Installed"
         value={info.installed ?? "No"}
@@ -294,7 +308,7 @@ function CaskDetail({ info }: { info: CaskInfo }) {
           <Text bold color={colors.warning}>
             Caveats:
           </Text>
-          <Text color={colors.subtext}>{info.caveats}</Text>
+          <Text color={colors.subtext}>{truncate(info.caveats, valueWidth * 2)}</Text>
         </Box>
       )}
     </Box>

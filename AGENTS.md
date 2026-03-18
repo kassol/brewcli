@@ -134,6 +134,7 @@ make test            # 运行测试
 
 ## 变更日志
 
+- 2026-03-18: UX 改进 — 主题持久化 (~/.config/brewcli)、StatusBar 上下文快捷键提示、ModalBox 实底+投影、Toast 顶部通知、Outdated 页面增加卸载
 - 2026-03-18: 增加运行时主题切换 (T 快捷键)，Catppuccin Mocha/Latte 双主题，ThemeProvider + useTheme 架构
 - 2026-03-18: 增加设计上下文并做最终 UI/UX polish，修正表格溢出、状态提示与终端边界情况
 - 2026-03-18: 增加截图/GIF、Release 工作流、Homebrew tap 发布链路

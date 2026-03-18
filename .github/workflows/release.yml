@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to release, e.g. v0.1.0"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -35,7 +41,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: macos-13
+          - runner: macos-15-intel
             asset_suffix: macos-x64
           - runner: macos-14
             asset_suffix: macos-arm64
@@ -59,7 +65,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          VERSION="${GITHUB_REF_NAME}"
+          VERSION="${{ github.event.inputs.tag || github.ref_name }}"
           ASSET="brewcli-${VERSION}-${{ matrix.asset_suffix }}.tar.gz"
           tar -czf "$ASSET" brewcli README.md LICENSE
           shasum -a 256 "$ASSET" | awk '{print $1}' > "$ASSET.sha256"
@@ -69,8 +75,8 @@ jobs:
         with:
           name: ${{ matrix.asset_suffix }}
           path: |
-            brewcli-${{ github.ref_name }}-${{ matrix.asset_suffix }}.tar.gz
-            brewcli-${{ github.ref_name }}-${{ matrix.asset_suffix }}.tar.gz.sha256
+            brewcli-${{ github.event.inputs.tag || github.ref_name }}-${{ matrix.asset_suffix }}.tar.gz
+            brewcli-${{ github.event.inputs.tag || github.ref_name }}-${{ matrix.asset_suffix }}.tar.gz.sha256
 
   publish-release:
     needs: build
@@ -85,6 +91,7 @@ jobs:
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
           generate_release_notes: true
           files: dist/*.tar.gz
 
@@ -105,11 +112,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          VERSION="${GITHUB_REF_NAME#v}"
-          ARM_ASSET="brewcli-${GITHUB_REF_NAME}-macos-arm64.tar.gz"
-          X64_ASSET="brewcli-${GITHUB_REF_NAME}-macos-x64.tar.gz"
-          ARM_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/${ARM_ASSET}"
-          X64_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/${X64_ASSET}"
+          RELEASE_TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          VERSION="${RELEASE_TAG#v}"
+          ARM_ASSET="brewcli-${RELEASE_TAG}-macos-arm64.tar.gz"
+          X64_ASSET="brewcli-${RELEASE_TAG}-macos-x64.tar.gz"
+          ARM_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${RELEASE_TAG}/${ARM_ASSET}"
+          X64_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${RELEASE_TAG}/${X64_ASSET}"
           ARM_SHA="$(cat dist/${ARM_ASSET}.sha256)"
           X64_SHA="$(cat dist/${X64_ASSET}.sha256)"
           python3 scripts/render_homebrew_formula.py \
@@ -137,7 +145,7 @@ jobs:
 
       - name: Commit and push tap update
         env:
-          VERSION: ${{ github.ref_name }}
+          VERSION: ${{ github.event.inputs.tag || github.ref_name }}
         shell: bash
         run: |
           set -euo pipefail

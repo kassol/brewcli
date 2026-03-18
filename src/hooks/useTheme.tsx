@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useMemo, useCallback } from "react";
 import type { Colors, ColorScheme } from "../theme.ts";
-import { darkColors, lightColors, detectColorScheme } from "../theme.ts";
+import { darkColors, lightColors } from "../theme.ts";
+import { getTheme, setTheme as persistTheme } from "../config.ts";
 
 interface ThemeContextValue {
   colors: Colors;
@@ -11,10 +12,14 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [colorScheme, setColorScheme] = useState<ColorScheme>(detectColorScheme);
+  const [colorScheme, setColorScheme] = useState<ColorScheme>(getTheme);
 
   const toggleTheme = useCallback(() => {
-    setColorScheme((s) => (s === "dark" ? "light" : "dark"));
+    setColorScheme((s) => {
+      const next = s === "dark" ? "light" : "dark";
+      persistTheme(next);
+      return next;
+    });
   }, []);
 
   const value = useMemo<ThemeContextValue>(

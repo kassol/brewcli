@@ -1,4 +1,6 @@
+import pkg from "../package.json";
+
 export const APP_NAME = "brewcli";
-export const APP_VERSION = "0.1.7";
+export const APP_VERSION: string = pkg.version;
 export const APP_DESCRIPTION =
   "Interactive Homebrew TUI built with Bun, TypeScript, and Ink";

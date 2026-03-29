@@ -10,17 +10,9 @@ describe("cleanup.cacheSize", () => {
   });
 });
 
-describe("cleanup.cleanup (dry-run)", () => {
+describe("cleanup.cleanAll (dry-run)", () => {
   test("dry-run returns output without actually cleaning", async () => {
-    const result = await cleanup.cleanup(true);
+    const result = await cleanup.cleanAll(true);
     expect(typeof result).toBe("string");
-    // Dry run should not throw
-  });
-});
-
-describe("cleanup.autoremove (dry-run)", () => {
-  test("dry-run returns output without actually removing", async () => {
-    const result = await cleanup.autoremove(true);
-    expect(typeof result).toBe("string");
-  });
+  }, 30_000);
 });

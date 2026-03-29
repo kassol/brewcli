@@ -1,17 +1,19 @@
 import { brewExec, clearCache } from "./executor.ts";
 
-export async function cleanup(dryRun = false): Promise<string> {
-  const args = dryRun ? ["cleanup", "--dry-run"] : ["cleanup"];
-  const output = await brewExec(args, { timeout: 120_000 });
-  if (!dryRun) clearCache();
-  return output;
-}
+export async function cleanAll(dryRun = false): Promise<string> {
+  const cleanupArgs = dryRun
+    ? ["cleanup", "--prune=all", "--dry-run"]
+    : ["cleanup", "--prune=all"];
+  const removeArgs = dryRun
+    ? ["autoremove", "--dry-run"]
+    : ["autoremove"];
 
-export async function autoremove(dryRun = false): Promise<string> {
-  const args = dryRun ? ["autoremove", "--dry-run"] : ["autoremove"];
-  const output = await brewExec(args, { timeout: 120_000 });
+  const cleanupOut = await brewExec(cleanupArgs, { timeout: 120_000 });
+  const removeOut = await brewExec(removeArgs, { timeout: 120_000 });
   if (!dryRun) clearCache();
-  return output;
+
+  const parts = [cleanupOut, removeOut].filter(Boolean);
+  return parts.join("\n");
 }
 
 export async function cacheSize(): Promise<string> {

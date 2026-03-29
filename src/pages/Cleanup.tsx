@@ -6,9 +6,7 @@ import { Loading } from "../components/Loading.tsx";
 import * as brew from "../brew/index.ts";
 
 interface CleanupState {
-  cacheSize: string;
   dryRunResult: string | null;
-  autoremoveResult: string | null;
   running: boolean;
   lastAction: string | null;
 }
@@ -27,9 +25,7 @@ export function Cleanup({ isFocused, onNotify }: CleanupProps) {
   );
 
   const [state, setState] = useState<CleanupState>({
-    cacheSize: "",
     dryRunResult: null,
-    autoremoveResult: null,
     running: false,
     lastAction: null,
   });
@@ -44,14 +40,10 @@ export function Cleanup({ isFocused, onNotify }: CleanupProps) {
           running: false,
           ...(action === "dry-run"
             ? { dryRunResult: result || "Nothing to clean up" }
-            : action === "autoremove-dry"
-              ? { autoremoveResult: result || "Nothing to remove" }
-              : {}),
+            : {}),
         }));
-        if (action === "cleanup") {
+        if (action === "clean-all") {
           onNotify("Cleanup complete", "success");
-        } else if (action === "autoremove") {
-          onNotify("Autoremove complete", "success");
         }
       } catch (e) {
         setState((s) => ({ ...s, running: false }));
@@ -66,19 +58,11 @@ export function Cleanup({ isFocused, onNotify }: CleanupProps) {
       if (state.running) return;
 
       if (input === "p") {
-        runAction("dry-run", () => brew.cleanup.cleanup(true));
+        runAction("dry-run", () => brew.cleanup.cleanAll(true));
         return;
       }
       if (input === "c") {
-        runAction("cleanup", () => brew.cleanup.cleanup(false));
-        return;
-      }
-      if (input === "a") {
-        runAction("autoremove-dry", () => brew.cleanup.autoremove(true));
-        return;
-      }
-      if (input === "A") {
-        runAction("autoremove", () => brew.cleanup.autoremove(false));
+        runAction("clean-all", () => brew.cleanup.cleanAll(false));
         return;
       }
       if (input === "D") {
@@ -116,16 +100,10 @@ export function Cleanup({ isFocused, onNotify }: CleanupProps) {
         </Text>
         <Box flexDirection="column">
           <Text color={colors.text}>
-            [p] Preview cleanup (dry-run)
+            [p] Preview (dry-run)
           </Text>
           <Text color={colors.text}>
-            [c] Run cleanup (remove old versions + cache)
-          </Text>
-          <Text color={colors.text}>
-            [a] Preview autoremove (dry-run)
-          </Text>
-          <Text color={colors.text}>
-            [A] Run autoremove (remove unused dependencies)
+            [c] Clean all (prune cache + remove unused deps)
           </Text>
           <Text color={colors.text}>
             [D] Run brew doctor
@@ -144,7 +122,7 @@ export function Cleanup({ isFocused, onNotify }: CleanupProps) {
       {state.dryRunResult && !state.running && (
         <Box flexDirection="column" marginTop={1}>
           <Text bold color={colors.warning}>
-            Cleanup Preview:
+            Preview:
           </Text>
           <Box
             borderStyle="single"
@@ -172,30 +150,6 @@ export function Cleanup({ isFocused, onNotify }: CleanupProps) {
         </Box>
       )}
 
-      {/* Autoremove results */}
-      {state.autoremoveResult && !state.running && (
-        <Box flexDirection="column" marginTop={1}>
-          <Text bold color={colors.warning}>
-            Autoremove Preview:
-          </Text>
-          <Box
-            borderStyle="single"
-            borderColor={colors.muted}
-            paddingX={1}
-            flexDirection="column"
-          >
-            {state.autoremoveResult
-              .split("\n")
-              .filter(Boolean)
-              .slice(0, 20)
-              .map((line, i) => (
-                <Text key={i} color={colors.subtext}>
-                  {line}
-                </Text>
-              ))}
-          </Box>
-        </Box>
-      )}
     </Box>
   );
 }
